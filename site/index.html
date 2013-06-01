@@ -50,34 +50,45 @@
 
     });
 
-function getCluters(schoolCode)
+function getClusters(schoolCode)
 {
-            $.getJSON('data/commute_data_denorm.json', function(data) {
+     var clusters = [];
 
-            var code = '1100';
 
-            var cluster = {};
-            var clusters = [];
+    $.ajax({
+        dataType: "json",
+        url: "data/commute_data_denorm.json",
+        data: {},
+        async: false,
+        success: function(data)
+        {
+                var code = schoolCode;
 
-             cluster.school_code = code;
+                var cluster = {};
+ 
+                 cluster.school_code = code;
 
-             $.each(data.school_code, function(key, val) {
+                 $.each(data.school_code, function(key, val) {
 
-                if(val == code)
-                {
-                    cluster.id = data.cluster[key];
-                    cluster.count = data.count[key];
-                    cluster.lat = data.lat[key];
-                    cluster.lon = data.lon[key];
+                    if(val == code)
+                    {
+                        cluster.id = data.cluster[key];
+                        cluster.count = data.count[key];
+                        cluster.lat = data.lat[key];
+                        cluster.lon = data.lon[key];
 
-                }
+                    }
 
-                clusters.push(cluster);
+                    clusters.push(cluster);
 
-              });
-          });
-          
-          return clusters;
+                  });
+                  
+                
+        }
+     });
+   
+    return clusters;
+
 }
         
     </script>
@@ -194,7 +205,23 @@ function getCluters(schoolCode)
 
         $(function(){
             $.getJSON('clusters.geojson', function(data){
-            geojson = L.geoJson(data).addTo(map);
+            geojson = L.geoJson(data, {
+                style: function (feature) {
+                    var clusters = [];
+                    
+                    clusters = getClusters('1101');
+                    var cluster_id = feature.id;
+                    
+                    if($.inArray(cluster_id, clusters))
+                    {
+                        return {color: 'red'};
+                    }
+                    else
+                    {
+                        return {color:'blue'}
+                    }
+                }      
+            }).addTo(map);
             console.log(geojson);
             })
         })
