@@ -200,7 +200,7 @@ function getClusters(schoolCode)
 <script src="bootstrap/js/bootstrap.min.js"></script>
     <script>
 
-        var map = L.map('map').setView([38.895111, -77.036667], 13);
+        var map = L.map('map').setView([38.895111, -77.036667], 11);
 
         L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
             maxZoom: 18,
@@ -256,8 +256,11 @@ function getClusters(schoolCode)
           var schoolID = myselect.options[myselect.selectedIndex].id;
           var clusters = getClusters(schoolID);
           // clusters[1].lat and .lon should work
-          //console.log(clusters[0].lon);
-          L.marker([clusters[0].lat, clusters[0].lon]).addTo(map);
+          //console.log(clusters);
+          var first_cluster = clusters[Object.keys(clusters)[0]];
+
+          //console.log(first_cluster);
+          L.marker([first_cluster.lat, first_cluster.lon]).addTo(map);
         }
 
     </script>
