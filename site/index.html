@@ -208,35 +208,9 @@ function getClusters(schoolCode)
         }).addTo(map);
 
         $(function(){
-            $.getJSON('clusters.geojson', function(data){
-            geojson = L.geoJson(data, {
-                style: function (feature) {
-                    var clusters = [];
-                    
-                    clusters = getClusters('1101');
-                    var id = feature.id;
-                    
-                    if(id in clusters  )
-                    {
-                        if(clusters[id].count >0)
-                        {
-                        return {color: 'blue'};
-                        }
-                        else
-                        {
-                            return {color:'red'}
-                        }
-                        
-                    }
-                    else
-                    {
-                        return {color:'red'}
-                    }
-                }      
-            }).addTo(map);
-            console.log(geojson);
-            })
+
         });
+
 
         var $select = $('#schoolsList');
         //request the JSON data and parse into the select element
@@ -259,10 +233,43 @@ function getClusters(schoolCode)
           //console.log(clusters);
           var first_cluster = clusters[Object.keys(clusters)[0]];
 
+           displayClusters(schoolID);
           //console.log(first_cluster);
           L.marker([first_cluster.lat, first_cluster.lon]).addTo(map);
         }
+function displayClusters(schoolId)
+{
+    $.getJSON('clusters.geojson', function(data){
+    geojson = L.geoJson(data, {
+            style: function (feature) {
+                var clusters = [];
 
+                clusters = getClusters(schoolId);
+                var id = feature.id;
+
+                if(id in clusters  )
+                {
+                    if(clusters[id].count >0)
+                    {
+                    return {color: 'blue'};
+                    }
+                    else
+                    {
+                        return {color:'red'}
+                    }
+
+                }
+                else
+                {
+                    return {color:'red'}
+                }
+            }      
+        }).addTo(map);
+
+        console.log(geojson);
+
+    });
+}
     </script>
   
 
