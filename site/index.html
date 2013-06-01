@@ -183,7 +183,7 @@ function getClusters(schoolCode)
       </p>
 
 
-        <select id="schoolsList" name="schoolsList"></select>
+        <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
 
       </div>
       <div class="span8">
@@ -250,6 +250,15 @@ function getClusters(schoolCode)
             $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
           })
         });
+
+        function schoolListSelected() {
+          var myselect = document.getElementById("schoolsList");
+          var schoolID = myselect.options[myselect.selectedIndex].id;
+          var clusters = getClusters(schoolID);
+          // clusters[1].lat and .lon should work
+          //console.log(clusters[0].lon);
+          L.marker([clusters[0].lat, clusters[0].lon]).addTo(map);
+        }
 
     </script>
   
