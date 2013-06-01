@@ -72,14 +72,17 @@ function getClusters(schoolCode)
 
                     if(val == code)
                     {
+                        cluster = {};
+                        
                         cluster.id = data.cluster[key];
                         cluster.count = data.count[key];
                         cluster.lat = data.lat[key];
                         cluster.lon = data.lon[key];
+                        clusters[cluster.id] = cluster;
 
                     }
 
-                    clusters.push(cluster);
+                    
 
                   });
                   
@@ -211,15 +214,23 @@ function getClusters(schoolCode)
                     var clusters = [];
                     
                     clusters = getClusters('1101');
-                    var cluster_id = feature.id;
+                    var id = feature.id;
                     
-                    if($.inArray(cluster_id, clusters))
+                    if(id in clusters  )
                     {
-                        return {color: 'red'};
+                        if(clusters[id].count >0)
+                        {
+                        return {color: 'blue'};
+                        }
+                        else
+                        {
+                            return {color:'red'}
+                        }
+                        
                     }
                     else
                     {
-                        return {color:'blue'}
+                        return {color:'red'}
                     }
                 }      
             }).addTo(map);
