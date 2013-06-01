@@ -245,13 +245,13 @@ function displayClusters(schoolId)
                 var clusters = [];
 
                 clusters = getClusters(schoolId);
-                var id = feature.id;
+                var id = parseInt(feature.properties.GIS_ID.substring(8));
 
                 if(id in clusters  )
                 {
                     if(clusters[id].count >0)
                     {
-                    return {color: 'blue'};
+                        return {color: 'blue'};
                     }
                     else
                     {
