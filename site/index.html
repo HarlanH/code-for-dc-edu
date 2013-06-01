@@ -50,34 +50,34 @@
 
     });
 
-function getCluters(schoolCode)
+function getClusters(schoolCode)
 {
-            $.getJSON('data/commute_data_denorm.json', function(data) {
+  return $.getJSON('data/commute_data_denorm.json', function(data) {
 
-            var code = '1100';
+    //var code = '1100';
+    var cluster = {};
+    var clusters = [];
 
-            var cluster = {};
-            var clusters = [];
+    cluster.school_code = schoolCode;
 
-             cluster.school_code = code;
+    $.each(data.school_code, function(key, val) {
 
-             $.each(data.school_code, function(key, val) {
+      if(val == schoolCode)
+      {
+          cluster.id = data.cluster[key];
+          cluster.count = data.count[key];
+          cluster.lat = data.lat[key];
+          cluster.lon = data.lon[key];
+          //console.log(cluster);
+          clusters.push(cluster);
+      }
 
-                if(val == code)
-                {
-                    cluster.id = data.cluster[key];
-                    cluster.count = data.count[key];
-                    cluster.lat = data.lat[key];
-                    cluster.lon = data.lon[key];
+      
 
-                }
+    });
 
-                clusters.push(cluster);
-
-              });
-          });
-          
-          return clusters;
+    return clusters;
+  });
 }
         
     </script>
@@ -169,7 +169,7 @@ function getCluters(schoolCode)
       </p>
 
 
-        <select id="schoolsList" name="schoolsList"></select>
+        <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
 
       </div>
       <div class="span8">
@@ -196,7 +196,7 @@ function getCluters(schoolCode)
         $(function(){
             $.getJSON('clusters.geojson', function(data){
             geojson = L.geoJson(data).addTo(map);
-            console.log(geojson);
+            //console.log(geojson);
             })
         });
 
@@ -212,6 +212,16 @@ function getCluters(schoolCode)
             $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
           })
         });
+
+        function schoolListSelected() {
+          var myselect = document.getElementById("schoolsList");
+          var schoolID = myselect.options[myselect.selectedIndex].id;
+          var clusters = getClusters(schoolID);
+          // clusters[1].lat and .lon should work
+          console.log(schoolID);
+          console.log(clusters);
+          L.marker([clusters[1].lon, clusters[1].lat]).addTo(map);
+        }
 
     </script>
   
