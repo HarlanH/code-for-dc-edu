@@ -19,14 +19,12 @@
       body {
         padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
         /* #map { min-height: 340px;width:400px; } */ 
-        
-      }
         #map {
  max-width: none;
  min-width: 0px;
  height: auto;
 }
-      
+      }
     </style>
     
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -42,45 +40,6 @@
    <link rel="shortcut icon" href="http://twitter.github.io/bootstrap/assets/ico/favicon.png">
     <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
-    <script type="text/javascript">
-    $(document).ready(function() {
-    // Handler for .ready() called.
-
-
-
-    });
-
-function getCluters(schoolCode)
-{
-            $.getJSON('data/commute_data_denorm.json', function(data) {
-
-            var code = '1100';
-
-            var cluster = {};
-            var clusters = [];
-
-             cluster.school_code = code;
-
-             $.each(data.school_code, function(key, val) {
-
-                if(val == code)
-                {
-                    cluster.id = data.cluster[key];
-                    cluster.count = data.count[key];
-                    cluster.lat = data.lat[key];
-                    cluster.lon = data.lon[key];
-
-                }
-
-                clusters.push(cluster);
-
-              });
-          });
-          
-          return clusters;
-}
-        
-    </script>
   </head>
 
   <body>
@@ -93,11 +52,11 @@ function getCluters(schoolCode)
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Transparent!</a>
+          <a class="brand" href="http://twitter.github.io/bootstrap/examples/starter-template.html#">Transparent!</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="#">Schools</a></li>
-              <li><a href="neighborhoods.html">Neighborhoods</a></li>
+              <li class="active"><a href="school.html">School</a></li>
+              <li><a href="neighborhood.html">Neighborhood</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
@@ -112,6 +71,7 @@ function getCluters(schoolCode)
 
     <div class="row-fluid">
       <div class="span4">
+        <h1>School</h1>
         <p>
           <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
@@ -167,10 +127,8 @@ function getCluters(schoolCode)
           </ul>
         </div>
       </p>
-
-
-        <select id="schoolsList" name="schoolsList"></select>
-
+  
+        <p>Use this document as a way to quick start any new project.<br> All you get is this message and a barebones HTML document.</p>
       </div>
       <div class="span8">
         <!-- http://stackoverflow.com/questions/11316383/bootstrap-hero-unit-height-leaflet -->
@@ -198,20 +156,7 @@ function getCluters(schoolCode)
             geojson = L.geoJson(data).addTo(map);
             console.log(geojson);
             })
-        });
-
-        var $select = $('#schoolsList');
-        //request the JSON data and parse into the select element
-        $.getJSON('data/schools.json', function(data){
-         
-          //clear the current content of the select
-          $select.html('');
-         
-          //iterate over the data and append a select option
-          $.each(data, function(key, val){
-            $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
-          })
-        });
+        })
 
     </script>
   
