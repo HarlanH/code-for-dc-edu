@@ -62,3 +62,8 @@ write.csv(dat, file='commute_data_denorm.csv')
 
 dat.json <- toJSON(dat)
 cat(dat.json, file='commute_data_denorm.json')
+
+cat(toJSON(alply(schools[,c('schoolname', 'school_code')], 1, 
+                  function(rr) as.list(rr)))
+    , file='schools.json')
+

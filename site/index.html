@@ -71,8 +71,7 @@
 
     <div class="row-fluid">
       <div class="span4">
-        <h1>Bootstrap starter template</h1>
-        <p>Use this document as a way to quick start any new project.<br> All you get is this message and a barebones HTML document.</p>
+        <select id="schoolsList" name="schoolsList"></select>
       </div>
       <div class="span8">
         <!-- http://stackoverflow.com/questions/11316383/bootstrap-hero-unit-height-leaflet -->
@@ -100,7 +99,20 @@
             geojson = L.geoJson(data).addTo(map);
             console.log(geojson);
             })
-        })
+        });
+
+        var $select = $('#schoolsList');
+        //request the JSON data and parse into the select element
+        $.getJSON('data/schools.json', function(data){
+         
+          //clear the current content of the select
+          $select.html('');
+         
+          //iterate over the data and append a select option
+          $.each(data, function(key, val){
+            $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
+          })
+        });
 
     </script>
   
