@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <!-- saved from url=(0065)http://twitter.github.io/bootstrap/examples/starter-template.html -->
-<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
-    <title>Map</title>
+    <title>Transparent!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -42,59 +44,9 @@
    <link rel="shortcut icon" href="http://twitter.github.io/bootstrap/assets/ico/favicon.png">
     <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
     <script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
-    <script type="text/javascript">
-    $(document).ready(function() {
-    // Handler for .ready() called.
+    <script src="bootstrap/js/bootstrap.min.js"></script>
 
-
-
-    });
-
-function getClusters(schoolCode)
-{
-     var clusters = [];
-
-
-    $.ajax({
-        dataType: "json",
-        url: "data/commute_data_denorm.json",
-        data: {},
-        async: false,
-        success: function(data)
-        {
-                var code = schoolCode;
-
-                var cluster = {};
- 
-                 cluster.school_code = code;
-
-                 $.each(data.school_code, function(key, val) {
-
-                    if(val == code)
-                    {
-                        cluster = {};
-                        
-                        cluster.id = data.cluster[key];
-                        cluster.count = data.count[key];
-                        cluster.lat = data.lat[key];
-                        cluster.lon = data.lon[key];
-                        clusters[cluster.id] = cluster;
-
-                    }
-
-                    
-
-                  });
-                  
-                
-        }
-     });
-   
-    return clusters;
-
-}
-        
-    </script>
+    <script src="transparent.js"></script>
   </head>
 
   <body>
@@ -107,10 +59,10 @@ function getClusters(schoolCode)
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">Transparent!</a>
+          <a class="brand" href="index.html">Transparent!</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li class="active"><a href="index.html">Schools</a></li>
+              <li><a href="school.html">Schools</a></li>
               <li><a href="neighborhood.html">Neighborhoods</a></li>
             </ul>
           </div><!--/.nav-collapse -->
@@ -119,82 +71,7 @@ function getClusters(schoolCode)
     </div>
 
  {{content}} 
-  </div> <!-- /container -->
-<script src="bootstrap/js/bootstrap.min.js"></script>
-    <script>
-
-        var map = L.map('map').setView([38.895111, -77.036667], 11);
-
-        L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
-        }).addTo(map);
-
-        $(function(){
-
-        });
-
-
-        var $select = $('#schoolsList');
-        //request the JSON data and parse into the select element
-        $.getJSON('data/schools.json', function(data){
-         
-          //clear the current content of the select
-          $select.html('');
-         
-          //iterate over the data and append a select option
-          $.each(data, function(key, val){
-            $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
-          })
-        });
-
-        function schoolListSelected() {
-          var myselect = document.getElementById("schoolsList");
-          var schoolID = myselect.options[myselect.selectedIndex].id;
-          var clusters = getClusters(schoolID);
-          // clusters[1].lat and .lon should work
-          //console.log(clusters);
-          var first_cluster = clusters[Object.keys(clusters)[0]];
-
-           displayClusters(schoolID);
-          //console.log(first_cluster);
-          L.marker([first_cluster.lat, first_cluster.lon]).addTo(map);
-        }
-function displayClusters(schoolId)
-{
-    $.getJSON('clusters.geojson', function(data){
-    geojson = L.geoJson(data, {
-            style: function (feature) {
-                var clusters = [];
-
-                clusters = getClusters(schoolId);
-                var id = parseInt(feature.properties.GIS_ID.substring(8));
-
-                if(id in clusters  )
-                {
-                    if(clusters[id].count >0)
-                    {
-                        return {color: 'blue'};
-                    }
-                    else
-                    {
-                        return {color:'red'}
-                    }
-
-                }
-                else
-                {
-                    return {color:'red'}
-                }
-            }      
-        }).addTo(map);
-
-        console.log(geojson);
-
-    });
-}
-    </script>
-  
+<script src="transparent-postload.js"></script>
 
 </body></html>
 
