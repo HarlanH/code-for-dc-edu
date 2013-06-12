@@ -43,16 +43,18 @@ function schoolListSelected() {
   //console.log(clusters);
   var first_cluster = clusters[Object.keys(clusters)[0]];
 
+  if(schoolmarker.length > 0){
+      map.removeLayer(geojson);
+  }
   for(i=0;i<schoolmarker.length;i++) {
       map.removeLayer(schoolmarker[i]);
-      map.removeLayer(geojson);
       schoolmarker.splice(i,1);
   }  
    displayClusters(schoolID);
    //console.log(first_cluster);
    var TempMarker = new L.marker([first_cluster.lat, first_cluster.lon]);
    schoolmarker.push(TempMarker);
-   schoolmarker[0].bindPopup(schoolID);
+   //schoolmarker[0].bindPopup(schoolID);
    map.addLayer(schoolmarker[0]);
 }
 function displayClusters(schoolId)
