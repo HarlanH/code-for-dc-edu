@@ -33,6 +33,8 @@ function getClusters(schoolCode)
   return clusters;
 }
 
+var schoolmarker = new Array(); 
+var geojson;
 function schoolListSelected() {
   var myselect = document.getElementById("schoolsList");
   var schoolID = myselect.options[myselect.selectedIndex].id;
@@ -41,9 +43,19 @@ function schoolListSelected() {
   //console.log(clusters);
   var first_cluster = clusters[Object.keys(clusters)[0]];
 
+  if(schoolmarker.length > 0){
+      map.removeLayer(geojson);
+  }
+  for(i=0;i<schoolmarker.length;i++) {
+      map.removeLayer(schoolmarker[i]);
+      schoolmarker.splice(i,1);
+  }  
    displayClusters(schoolID);
-  //console.log(first_cluster);
-  L.marker([first_cluster.lat, first_cluster.lon]).addTo(map);
+   //console.log(first_cluster);
+   var TempMarker = new L.marker([first_cluster.lat, first_cluster.lon]);
+   schoolmarker.push(TempMarker);
+   //schoolmarker[0].bindPopup(schoolID);
+   map.addLayer(schoolmarker[0]);
 }
 function displayClusters(schoolId)
 {
