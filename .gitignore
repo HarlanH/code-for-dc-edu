@@ -7,3 +7,5 @@
 /_site
 
 /_layouts/.DS_Store
+data/*.pdf
+data/*.png
