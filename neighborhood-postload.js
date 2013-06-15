@@ -13,6 +13,16 @@ L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/
 
 
 // draw neighborhood boundaries on neighborhood map and attach event listeners
+function style(feature) {
+    return {
+        fillColor: 'grey',
+        weight: 2,
+        opacity: .7,
+        color: 'white',
+        //dashArray: '3',
+        fillOpacity: 0.7
+    };
+}
 $.getJSON('clusters.geojson', function(data){
-    geojson = L.geoJson(data).addTo(neighmap);
+    geojson = L.geoJson(data, {style: style}).addTo(neighmap);
 });
