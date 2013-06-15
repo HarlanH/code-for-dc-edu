@@ -13,6 +13,21 @@ L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/
 
 
 // draw neighborhood boundaries on neighborhood map and attach event listeners
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+    this._div.innerHTML = props ? props.NBH_NAMES : "Hover over a Neighborhood Cluster";
+};
+
+info.addTo(neighmap);
+
 function style(feature) {
     return {
         fillColor: 'grey',
@@ -37,9 +52,11 @@ function highlightFeature(e) {
     if (!L.Browser.ie && !L.Browser.opera) {
         layer.bringToFront();
     }
+    info.update(layer.feature.properties);
 }
 function resetHighlight(e) {
     geojson.resetStyle(e.target);
+    info.update();
 }
 function onEachFeature(feature, layer) {
     layer.on({
