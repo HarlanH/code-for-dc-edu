@@ -62,12 +62,19 @@ function displaySchools(e) {
 	var layer = e.target;
 	// get the schools for this cluster
 	var cluster_id = parseInt(layer.feature.properties.GIS_ID.substring(8));
+	console.log(cluster_id);
 	var schools = getSchools(cluster_id);
-
+	console.log(schools);
 	// iterate, plot the points and lines
 	for (i = 0; i < schools.length; i++) {
-		var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5}); //+(schools[i].count<10?1:schools[i].count.sqrt())});
-		marker.addTo(neighmap);
+		if (typeof schools[i].lat === 'number') {
+			var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
+			//marker.addTo(neighmap);
+			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
+				[nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
+				{ weight: 1+((schools[i].count<10)?0:Math.sqrt(schools[i].count)) });
+			lineseg.addTo(neighmap);
+		} // TODO: log that we've got a school iwth no location!
 	}
 }
 function onEachFeature(feature, layer) {

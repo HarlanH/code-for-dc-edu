@@ -118,3 +118,8 @@ function displayClusters(schoolId)
 
     });
 }
+
+var nc_centers;
+$.getJSON('data/nc_names_centers.json', function(data) {
+  nc_centers = data;
+})
