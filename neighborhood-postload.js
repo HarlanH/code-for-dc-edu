@@ -58,11 +58,23 @@ function resetHighlight(e) {
     geojson.resetStyle(e.target);
     info.update();
 }
+function displaySchools(e) {
+	var layer = e.target;
+	// get the schools for this cluster
+	var cluster_id = parseInt(layer.feature.properties.GIS_ID.substring(8));
+	var schools = getSchools(cluster_id);
+
+	// iterate, plot the points and lines
+	for (i = 0; i < schools.length; i++) {
+		var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5}); //+(schools[i].count<10?1:schools[i].count.sqrt())});
+		marker.addTo(neighmap);
+	}
+}
 function onEachFeature(feature, layer) {
     layer.on({
         mouseover: highlightFeature,
-        mouseout: resetHighlight//,
-        //click: zoomToFeature
+        mouseout: resetHighlight,
+        click: displaySchools
     });
 }
 var geojson;
