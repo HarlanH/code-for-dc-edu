@@ -23,6 +23,33 @@ function style(feature) {
         fillOpacity: 0.7
     };
 }
+function highlightFeature(e) {
+    var layer = e.target;
+
+    layer.setStyle({
+        weight: 5,
+        opacity: 1
+        //color: '#666',
+        //dashArray: '',
+        //fillOpacity: 0.7
+    });
+
+    if (!L.Browser.ie && !L.Browser.opera) {
+        layer.bringToFront();
+    }
+}
+function resetHighlight(e) {
+    geojson.resetStyle(e.target);
+}
+function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight//,
+        //click: zoomToFeature
+    });
+}
+var geojson;
 $.getJSON('clusters.geojson', function(data){
-    geojson = L.geoJson(data, {style: style}).addTo(neighmap);
+    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(neighmap);
 });
+
