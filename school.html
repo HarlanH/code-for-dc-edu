@@ -2,70 +2,34 @@
 layout: default
 ---
   <div class="container-fluid">
-
-      
-
-    
-
     <div class="row-fluid">
       <div class="span4">
-        <b>Choose a school to see where its students commute from.</b>
+        <b>Choose a school to see where its students commute from. Unselect the buttons to
+          see fewer schools in the list.</b>
         <p>
-          <div class="btn-group">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            System
-            <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu">
-            <!-- dropdown menu links -->
-            <li>
-              <a href="blah">DCPS</a>
-            </li>
-            <li>
-              <a href="blah">Charter</a>
-            </li>
-
-          </ul>
-        </div>
-
-         <div class="btn-group">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            Grade Level
-            <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu">
-            <!-- dropdown menu links -->
-            <li>
-              <a href="blah">Elementary</a>
-            </li>
-            <li>
-              <a href="blah">Secondary</a>
-            </li>
-
-          </ul>
-        </div>
-
-         <div class="btn-group">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            School
-            <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu">
-            <!-- dropdown menu links -->
-            <li>
-              <a href="blah">Elementary School 1</a>
-            </li>
-            <li>
-              <a href="blah">Elementary School 2</a>
-            </li>
-
-          </ul>
-        </div>
+          <div id="systembuttons" class="btn-group" data-toggle="buttons-checkbox">
+        <button id="charter" type="button" class="btn btn-primary active">Charter</button>
+        <button id="public" type="button" class="btn btn-primary active">Public</button>
+      </div>
+      <div id="levelsbuttons" class="btn-group" data-toggle="buttons-checkbox">
+        <button id="elementary" type="button" class="btn btn-primary active">Elementary</button>
+        <button id="middle" type="button" class="btn btn-primary active">Middle</button>
+        <button id="high" type="button" class="btn btn-primary active">High</button>
+      </div>
       </p>
-  
+      <p>
+      <div id="wardsbuttons" class="btn-group" data-toggle="buttons-radio">
+        <button id="wall" type="button" class="btn active">All Wards</button>
+        <button id="w1" type="button" class="btn">1</button>
+        <button id="w2" type="button" class="btn">2</button>
+        <button id="w3" type="button" class="btn">3</button>
+        <button id="w4" type="button" class="btn">4</button>
+        <button id="w5" type="button" class="btn">5</button>
+        <button id="w6" type="button" class="btn">6</button>
+        <button id="w7" type="button" class="btn">7</button>
+        <button id="w8" type="button" class="btn">8</button>
+      </div>
+      </p>
         <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
 
       </div>
