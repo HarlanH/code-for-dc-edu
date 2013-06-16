@@ -38,7 +38,7 @@ function style(feature) {
         fillOpacity: 0.7
     };
 }
-function highlightFeature(e) {
+function highlightNC(e) {
     var layer = e.target;
 
     layer.setStyle({
@@ -48,15 +48,28 @@ function highlightFeature(e) {
         //dashArray: '',
         //fillOpacity: 0.7
     });
-
-    if (!L.Browser.ie && !L.Browser.opera) {
-        layer.bringToFront();
-    }
     info.update(layer.feature.properties);
 }
-function resetHighlight(e) {
+function resetNC(e) {
     geojson.resetStyle(e.target);
     info.update();
+}
+function highlightLine(e) {
+	var layer = e.target;
+
+    layer.setStyle({
+        opacity: 1,
+        color: 'red'
+    });
+    info._div.innerHTML = e.target.options.txt;
+}
+function resetLine(e) {
+	var layer = e.target;
+
+    layer.setStyle({
+        opacity: .5,
+        color: 'blue'
+    });
 }
 function displaySchools(e) {
 	var layer = e.target;
@@ -72,15 +85,19 @@ function displaySchools(e) {
 			//marker.addTo(neighmap);
 			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
 				[nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
-				{ weight: 1+((schools[i].count<10)?0:Math.sqrt(schools[i].count)) });
+				{ weight: 1+((schools[i].count<10)?0:Math.sqrt(schools[i].count)),
+				  opacity: .5, color: 'blue',
+				  txt: schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students" });
 			lineseg.addTo(neighmap);
+			lineseg.on({mouseover: highlightLine, mouseout: resetLine});
+			//lineseg.bindPopup(schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students")
 		} // TODO: log that we've got a school iwth no location!
 	}
 }
 function onEachFeature(feature, layer) {
     layer.on({
-        mouseover: highlightFeature,
-        mouseout: resetHighlight,
+        mouseover: highlightNC,
+        mouseout: resetNC,
         click: displaySchools
     });
 }
