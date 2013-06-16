@@ -71,8 +71,14 @@ function resetLine(e) {
         color: 'blue'
     });
 }
+var school_lines = new Array(); 
 function displaySchools(e) {
 	var layer = e.target;
+
+	// wipe any old school lines
+	while (school_lines.length > 0) {
+		neighmap.removeLayer(school_lines.pop())
+	}
 	// get the schools for this cluster
 	var cluster_id = parseInt(layer.feature.properties.GIS_ID.substring(8));
 	console.log(cluster_id);
@@ -81,7 +87,7 @@ function displaySchools(e) {
 	// iterate, plot the points and lines
 	for (i = 0; i < schools.length; i++) {
 		if (typeof schools[i].lat === 'number') {
-			var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
+			//var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
 			//marker.addTo(neighmap);
 			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
 				[nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
@@ -90,6 +96,7 @@ function displaySchools(e) {
 				  txt: schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students" });
 			lineseg.addTo(neighmap);
 			lineseg.on({mouseover: highlightLine, mouseout: resetLine});
+			school_lines.push(lineseg);
 			//lineseg.bindPopup(schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students")
 		} // TODO: log that we've got a school iwth no location!
 	}
