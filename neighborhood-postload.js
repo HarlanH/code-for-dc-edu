@@ -21,7 +21,7 @@ $(document).ready(function() {
 
 	// method that we will use to update the control based on feature properties passed
 	infobox.update = function (props) {
-	    this._div.innerHTML = props ? props.NBH_NAMES : "Hover over a Neighborhood Cluster";
+	    this._div.innerHTML = props ? props.NBH_NAMES : "Hover over or Click to learn more";
 	};
 
 	infobox.addTo(neighmap);
@@ -77,11 +77,12 @@ function displaySchools(e) {
 									  [nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
 				{
 					weight: 3+((schools[i].count<10)?0:Math.sqrt(schools[i].count/4.0)),
+					orig_weight: 3+((schools[i].count<10)?0:Math.sqrt(schools[i].count/4.0)),
 				  	opacity: line_opacity(schools[i].count),
 				  	orig_opacity: line_opacity(schools[i].count),
                     color: getColor(schools[i].count),
                     orig_color: getColor(schools[i].count),
-				 	txt: schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students" 
+				 	txt: nc_centers.names[cluster_id-1] + " -> " + schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students" 
 				});
 
 			lineseg.addTo(neighmap);

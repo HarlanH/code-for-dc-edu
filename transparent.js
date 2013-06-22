@@ -74,7 +74,7 @@ function style(feature) {
         opacity: .7,
         color: 'white',
         //dashArray: '3',
-        fillOpacity: 0.7
+        fillOpacity: 0.5
     };
 }
 
@@ -112,7 +112,8 @@ function highlightLine(e) {
 
     layer.setStyle({
         opacity: 1,
-        color: 'darkblue'
+        weight: layer.options.weight + 3
+        //color: 'darkblue'
     });
     if (infobox) {
       infobox._div.innerHTML = e.target.options.txt;
@@ -123,7 +124,8 @@ function resetLine(e) {
 
     layer.setStyle({
         opacity: layer.options.orig_opacity,
-        color: layer.options.orig_color
+        weight: layer.options.orig_weight
+        //color: layer.options.orig_color
     });
 }
 function highlightNC(e) {
