@@ -1,32 +1,56 @@
+// set up global variables (uh oh) here
+var neighmap = L.map('neighmap').setView([38.895111, -77.036667], 11);
+var info = L.control();
+var grades = [0, 10, 20, 50, 80, 120, 150];
+var school_lines = new Array(); 
+var geojson;
+var legend = L.control({position: 'bottomleft'});
+
+// the document's ready, so we can do stuff to it
 $(document).ready(function() {
-// Handler for .ready() called.
+	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+	    maxZoom: 18,
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	}).addTo(neighmap);
+
+	// draw neighborhood boundaries on neighborhood map and attach event listeners
+	info.onAdd = function (map) {
+	    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+	    this.update();
+	    return this._div;
+	};
+
+	// method that we will use to update the control based on feature properties passed
+	info.update = function (props) {
+	    this._div.innerHTML = props ? props.NBH_NAMES : "Hover over a Neighborhood Cluster";
+	};
+
+	info.addTo(neighmap);
+
+	$.getJSON('clusters.geojson', function(data){
+	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(neighmap);
+	});
+
+
+	// http://leafletjs.com/examples/choropleth.html
+	legend.onAdd = function (neighmap) {
+	    var div = L.DomUtil.create('div', 'info legend'),
+	    labels = [];
+	    // loop through our density intervals and generate a label with a colored square for each interval
+	    for (var i = 0; i < grades.length; i++) {
+	        div.innerHTML +=
+	            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+	            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+	    }
+	    return div;
+	};
+
 
 });
 
-//var map = L.map('map').setView([38.895111, -77.036667], 11);
-var neighmap = L.map('neighmap').setView([38.895111, -77.036667], 11);
-
-L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
-}).addTo(neighmap);
+// function defs below
 
 
-// draw neighborhood boundaries on neighborhood map and attach event listeners
-var info = L.control();
-
-info.onAdd = function (map) {
-    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-    this.update();
-    return this._div;
-};
-
-// method that we will use to update the control based on feature properties passed
-info.update = function (props) {
-    this._div.innerHTML = props ? props.NBH_NAMES : "Hover over a Neighborhood Cluster";
-};
-
-info.addTo(neighmap);
 
 function style(feature) {
     return {
@@ -71,7 +95,6 @@ function resetLine(e) {
         color: 'blue'
     });
 }
-var grades = [0, 10, 20, 50, 80, 120, 150];
 function getColor(d) {
     return d > grades[6] ? '#800026':
            d > grades[5] ? '#BD0026':
@@ -98,7 +121,6 @@ function line_opacity(d){
          0.7 ;
 }
 
-var school_lines = new Array(); 
 function displaySchools(e) {
 	var layer = e.target;
 
@@ -140,25 +162,5 @@ function onEachFeature(feature, layer) {
         click: displaySchools
     });
 }
-var geojson;
-$.getJSON('clusters.geojson', function(data){
-    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(neighmap);
-});
-
-
-// http://leafletjs.com/examples/choropleth.html
-var legend = L.control({position: 'bottomleft'});
-legend.onAdd = function (neighmap) {
-    var div = L.DomUtil.create('div', 'info legend'),
-    labels = [];
-    // loop through our density intervals and generate a label with a colored square for each interval
-    for (var i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-    }
-    return div;
-};
-
 
 
