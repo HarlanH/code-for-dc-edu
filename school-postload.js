@@ -1,40 +1,33 @@
-$(document).ready(function() {
-// Handler for .ready() called.
-
-});
-
+// set up global variables (uh oh) here
 var map = L.map('map').setView([38.895111, -77.036667], 11);
-//var neighmap = L.map('neighmap').setView([38.895111, -77.036667], 11);
-
-L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
-}).addTo(map);
-
-// L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
-//     maxZoom: 18,
-//     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
-// }).addTo(neighmap);
-
 var $select = $('#schoolsList');
-//request the JSON data and parse into the select element
-$.getJSON('data/schools.json', function(data){
- 
-  //clear the current content of the select
-  $select.html('');
- 
-  //iterate over the data and append a select option
-  $.each(data, function(key, val){
-    $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
-  })
-});
-
-// // draw neighborhood boundaries on neighborhood map and attach event listeners
-// $.getJSON('clusters.geojson', function(data){
-//     geojson = L.geoJson(data).addTo(neighmap);
-// });
 var schoolmarker = new Array(); 
 var geojson;
+
+// the document's ready, so we can do stuff to it
+$(document).ready(function() {
+	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+	    maxZoom: 18,
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	}).addTo(map);
+
+	//request the JSON data and parse into the select element
+	$.getJSON('data/schools.json', function(data){
+	 
+	  //clear the current content of the select
+	  $select.html('');
+	 
+	  //iterate over the data and append a select option
+	  $.each(data, function(key, val){
+	    $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
+	  })
+	});
+
+});
+
+// function defs below
+
+
 function schoolListSelected() {
   var myselect = document.getElementById("schoolsList");
   var schoolID = myselect.options[myselect.selectedIndex].id;
