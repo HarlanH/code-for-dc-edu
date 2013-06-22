@@ -83,7 +83,7 @@ function highlightLine(e) {
 
     layer.setStyle({
         opacity: 1,
-        color: 'red'
+        color: 'darkblue'
     });
     info._div.innerHTML = e.target.options.txt;
 }
@@ -91,8 +91,8 @@ function resetLine(e) {
 	var layer = e.target;
 
     layer.setStyle({
-        opacity: .5,
-        color: 'blue'
+        opacity: layer.options.orig_opacity,
+        color: layer.options.orig_color
     });
 }
 function getColor(d) {
@@ -125,9 +125,9 @@ function displaySchools(e) {
 	var layer = e.target;
 
 	if (school_lines.length > 0) {
-            legend.removeFrom(neighmap);
-        }
-        legend.addTo(neighmap);
+        legend.removeFrom(neighmap);
+    }
+    legend.addTo(neighmap);
 	// wipe any old school lines
 	while (school_lines.length > 0) {
             neighmap.removeLayer(school_lines.pop());
@@ -143,14 +143,22 @@ function displaySchools(e) {
 			//var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
 			//marker.addTo(neighmap);
 			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
-				[nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
-				{ weight: 3+((schools[i].count<10)?0:Math.sqrt(schools[i].count/4.0)),
-				  opacity: line_opacity(schools[i].count), 
-                                  color: getColor(schools[i].count),
-				  txt: schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students" });
+									  [nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
+				{
+					weight: 3+((schools[i].count<10)?0:Math.sqrt(schools[i].count/4.0)),
+				  	opacity: line_opacity(schools[i].count),
+				  	orig_opacity: line_opacity(schools[i].count),
+                    color: getColor(schools[i].count),
+                    orig_color: getColor(schools[i].count),
+				 	txt: schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students" 
+				});
+
 			lineseg.addTo(neighmap);
-			lineseg.on({mouseover: highlightLine, mouseout: resetLine});
+
+			lineseg.on({ mouseover: highlightLine, mouseout: resetLine });
+
 			school_lines.push(lineseg);
+
 			//lineseg.bindPopup(schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students")
 		} // TODO: log that we've got a school iwth no location!
 	}
