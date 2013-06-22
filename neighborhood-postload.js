@@ -1,7 +1,6 @@
 // set up global variables (uh oh) here
 var neighmap = L.map('neighmap').setView([38.895111, -77.036667], 11);
-var info = L.control();
-var grades = [0, 10, 20, 50, 80, 120, 150];
+var infobox = L.control();
 var school_lines = new Array(); 
 var geojson;
 var legend = L.control({position: 'bottomleft'});
@@ -14,18 +13,18 @@ $(document).ready(function() {
 	}).addTo(neighmap);
 
 	// draw neighborhood boundaries on neighborhood map and attach event listeners
-	info.onAdd = function (map) {
+	infobox.onAdd = function (map) {
 	    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
 	    this.update();
 	    return this._div;
 	};
 
 	// method that we will use to update the control based on feature properties passed
-	info.update = function (props) {
+	infobox.update = function (props) {
 	    this._div.innerHTML = props ? props.NBH_NAMES : "Hover over a Neighborhood Cluster";
 	};
 
-	info.addTo(neighmap);
+	infobox.addTo(neighmap);
 
 	$.getJSON('clusters.geojson', function(data){
 	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(neighmap);
@@ -52,74 +51,6 @@ $(document).ready(function() {
 
 
 
-function style(feature) {
-    return {
-        fillColor: 'grey',
-        weight: 2,
-        opacity: .7,
-        color: 'white',
-        //dashArray: '3',
-        fillOpacity: 0.7
-    };
-}
-function highlightNC(e) {
-    var layer = e.target;
-
-    layer.setStyle({
-        weight: 5,
-        opacity: 1
-        //color: '#666',
-        //dashArray: '',
-        //fillOpacity: 0.7
-    });
-    info.update(layer.feature.properties);
-}
-function resetNC(e) {
-    geojson.resetStyle(e.target);
-    info.update();
-}
-function highlightLine(e) {
-	var layer = e.target;
-
-    layer.setStyle({
-        opacity: 1,
-        color: 'darkblue'
-    });
-    info._div.innerHTML = e.target.options.txt;
-}
-function resetLine(e) {
-	var layer = e.target;
-
-    layer.setStyle({
-        opacity: layer.options.orig_opacity,
-        color: layer.options.orig_color
-    });
-}
-function getColor(d) {
-    return d > grades[6] ? '#800026':
-           d > grades[5] ? '#BD0026':
-           d > grades[4] ? '#E31A1C':
-           d > grades[3] ? '#FC4E2A':
-           d > grades[2] ? '#FD8D3C':
-           d > grades[1] ? '#FEB24C':
-                           '#FFEDA0';
-}
-//           d > grades[1] ? '#FED976':
-function getColorR(d) {
-    return d > grades[6] ? '#FFEDA0':
-           d > grades[5] ? '#FEB24C':
-           d > grades[4] ? '#FD8D3C':
-           d > grades[3] ? '#FC4E2A':
-           d > grades[2] ? '#E31A1C':
-           d > grades[1] ? '#BD0026':
-                           '#800026';
-//           d > grades[6] ? '#FED976':
-}
-function line_opacity(d){
-    return d<2   ? 0.3 : 
-        d<100 ? 0.3 + (d/100.0)*0.4 : 
-         0.7 ;
-}
 
 function displaySchools(e) {
 	var layer = e.target;
