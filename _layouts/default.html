@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=9; IE=8;" />
-    <title>Open Schools!</title>
+    <title>{{ page.title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -83,8 +83,8 @@
           <a class="brand" href="index.html">Open Schools!</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
-              <li><a href="school.html">Schools</a></li>
-              <li><a href="neighborhood.html">Neighborhoods</a></li>
+              <li {% if page.title == 'Schools' %}class="active"{% endif %}><a href="school.html">Schools</a></li>
+              <li {% if page.title == 'Neighborhoods' %}class="active"{% endif %}><a href="neighborhood.html">Neighborhoods</a></li>
             </ul>
           </div><!--/.nav-collapse -->
         </div>
