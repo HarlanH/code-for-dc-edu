@@ -1,3 +1,5 @@
+// 997 was what we were using before. 53124 is a nice B&W
+var tileString = 'http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/53124/256/{z}/{x}/{y}.png';
 
 function getClusters(schoolCode)
 {
@@ -69,10 +71,10 @@ $.getJSON('data/nc_names_centers.json', function(data) {
 
 function style(feature) {
     return {
-        fillColor: 'grey',
+        fillColor: '#3875A3',
         weight: 2,
         opacity: .7,
-        color: 'white',
+        color: '#12446A',
         //dashArray: '3',
         fillOpacity: 0.5
     };
@@ -101,9 +103,9 @@ function getColorR(d) {
 //           d > grades[6] ? '#FED976':
 }
 function line_opacity(d){
-    return d<2   ? 0.3 : 
-        d<100 ? 0.3 + (d/100.0)*0.4 : 
-         0.7 ;
+    return d<2   ? 0.4 : 
+        d<100 ? 0.4 + (d/100.0)*0.5 : 
+         0.9 ;
 }
 
 function highlightLine(e) {

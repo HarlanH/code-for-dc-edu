@@ -1,5 +1,5 @@
 // set up global variables (uh oh) here
-var neighmap = L.map('neighmap').setView([38.895111, -77.036667], 11);
+var neighmap = L.map('neighmap', {minZoom:11, maxZoom:14}).setView([38.895111, -77.036667], 12);
 var infobox = L.control();
 var school_lines = new Array(); 
 var geojson;
@@ -7,7 +7,7 @@ var legend = L.control({position: 'bottomleft'});
 
 // the document's ready, so we can do stuff to it
 $(document).ready(function() {
-	L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+	L.tileLayer(tileString, {
 	    maxZoom: 18,
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 	}).addTo(neighmap);
