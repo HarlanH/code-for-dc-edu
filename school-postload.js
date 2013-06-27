@@ -20,6 +20,8 @@ $(document).ready(function() {
 	 
 	  //clear the current content of the select
 	  $select.html('');
+	  // add instructions
+	  $select.append('<option>Pick a School</option>')
 	 
 	  //iterate over the data and append a select option
 	  $.each(data, function(key, val){
