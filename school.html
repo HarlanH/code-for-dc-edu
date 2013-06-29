@@ -8,7 +8,8 @@ title: Schools
         <b>Choose a school to see where its students commute from. Unselect the buttons to
           see fewer schools in the list.</b>
         <p>
-          <div id="systembuttons" class="btn-group" data-toggle="buttons-checkbox">
+<!--
+      <div id="systembuttons" class="btn-group" data-toggle="buttons-checkbox">
         <button id="charter" type="button" class="btn btn-primary active">Charter</button>
         <button id="public" type="button" class="btn btn-primary active">Public</button>
       </div>
@@ -17,18 +18,39 @@ title: Schools
         <button id="middle" type="button" class="btn btn-primary active">Middle</button>
         <button id="high" type="button" class="btn btn-primary active">High</button>
       </div>
+-->
+      <div id="systembuttons" >
+        <span id="charter" class="label label-info">Charter</span>
+        <span id="public" class="label label-info">Public</span>
+      </div>
+      <div id="levelsbuttons" >
+        <span id="elementary" class="label label-info">Elementary</span>
+        <span id="middle" class="label label-info">Middle</span>
+
+        <span id="high" class="label label-info">High</span>
+      </div>
       </p>
       <p>
       <div id="wardsbuttons" class="btn-group" data-toggle="buttons-radio">
         <button id="wall" type="button" class="btn active">All Wards</button>
-        <button id="w1" type="button" class="btn">1</button>
+        <span id="w1" class="badge">1</span> 
+        <span id="w2" class="badge">2</span>
+        <span id="w3" class="badge">3</span>
+        <span id="w4" class="badge">4</span>
+        <span id="w5" class="badge">5</span>
+        <span id="w6" class="badge">6</span>
+        <span id="w7" class="badge">7</span>
+        <span id="w8" class="badge">8</span> 
+<!--
+        <button id="w1" type="button" class="btn">1</button> 
         <button id="w2" type="button" class="btn">2</button>
         <button id="w3" type="button" class="btn">3</button>
         <button id="w4" type="button" class="btn">4</button>
         <button id="w5" type="button" class="btn">5</button>
         <button id="w6" type="button" class="btn">6</button>
         <button id="w7" type="button" class="btn">7</button>
-        <button id="w8" type="button" class="btn">8</button>
+        <button id="w8" type="button" class="btn">8</button> 
+-->
       </div>
       </p>
         <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
