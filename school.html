@@ -2,48 +2,51 @@
 layout: default
 title: Schools
 ---
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span4">
-        <b>Choose a school to see where its students commute from. Unselect the buttons to
-          see fewer schools in the list.</b>
-        <p>
-          <div id="systembuttons" class="btn-group" data-toggle="buttons-checkbox">
-        <button id="charter" type="button" class="btn btn-primary active">Charter</button>
-        <button id="public" type="button" class="btn btn-primary active">Public</button>
-      </div>
-      <div id="levelsbuttons" class="btn-group" data-toggle="buttons-checkbox">
-        <button id="elementary" type="button" class="btn btn-primary active">Elementary</button>
-        <button id="middle" type="button" class="btn btn-primary active">Middle</button>
-        <button id="high" type="button" class="btn btn-primary active">High</button>
-      </div>
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span4">
+      <b>Choose a school to see where its students commute from. 
+        <div style='color:#DDDDDD'>Unselect the buttons to
+        see fewer schools in the list.</div>
+      </b>
+      <p>
+        <div id="systembuttons" class="btn-group " data-toggle="buttons-checkbox">
+          <button id="charter" type="button" class="btn btn-primary active btn-disabled">Charter</button>
+          <button id="public" type="button" class="btn btn-primary active btn-disabled">Public</button>
+        </div>
+        <div id="levelsbuttons" class="btn-group btn-disabled" data-toggle="buttons-checkbox">
+          <button id="elementary" type="button" class="btn btn-primary active btn-disabled">Elementary</button>
+          <button id="middle" type="button" class="btn btn-primary active btn-disabled">Middle</button>
+          <button id="high" type="button" class="btn btn-primary active btn-disabled">High</button>
+        </div>
       </p>
       <p>
-      <div id="wardsbuttons" class="btn-group" data-toggle="buttons-radio">
-        <button id="wall" type="button" class="btn active">All Wards</button>
-        <button id="w1" type="button" class="btn">1</button>
-        <button id="w2" type="button" class="btn">2</button>
-        <button id="w3" type="button" class="btn">3</button>
-        <button id="w4" type="button" class="btn">4</button>
-        <button id="w5" type="button" class="btn">5</button>
-        <button id="w6" type="button" class="btn">6</button>
-        <button id="w7" type="button" class="btn">7</button>
-        <button id="w8" type="button" class="btn">8</button>
-      </div>
-      </p>
-        <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
-
-      </div>
-      <div class="span8">
-        <!-- http://stackoverflow.com/questions/11316383/bootstrap-hero-unit-height-leaflet -->
-        <div id="map" style="height: 600px"></div>
-        <!-- Le javascript
-        ================================================== -->
-        <!-- Placed at the end of the document so the pages load faster -->
-        
+        <div id="wardsbuttons" class="btn-group btn-disabled" data-toggle="buttons-radio">
+          <button id="wall" type="button" class="btn active btn-disabled">All Wards</button>
+          <button id="w1" type="button" class="btn btn-disabled">1</button>
+          <button id="w2" type="button" class="btn btn-disabled">2</button>
+          <button id="w3" type="button" class="btn btn-disabled">3</button>
+          <button id="w4" type="button" class="btn btn-disabled">4</button>
+          <button id="w5" type="button" class="btn btn-disabled">5</button>
+          <button id="w6" type="button" class="btn btn-disabled">6</button>
+          <button id="w7" type="button" class="btn btn-disabled">7</button>
+          <button id="w8" type="button" class="btn btn-disabled">8</button>
         </div>
-      </div>
+      </p>
+      
+      <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
+
     </div>
+    <div class="span8">
+      <!-- http://stackoverflow.com/questions/11316383/bootstrap-hero-unit-height-leaflet -->
+      <div id="map" style="height: 600px"></div>
+      <!-- Le javascript
+      ================================================== -->
+      <!-- Placed at the end of the document so the pages load faster -->
+      
+    </div>
+  </div>
+</div>
 
 <script src="school-postload.js"></script>
 
