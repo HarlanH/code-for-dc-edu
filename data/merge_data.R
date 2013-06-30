@@ -7,7 +7,7 @@ library(stringr)
 library(rjson)
 
 commute <- read.csv("school-cluster-mapping-2012-v2.csv")
-schools <- read.csv("school-locs2-coded.csv")
+schools <- read.csv("school-locs3-coded.csv")
 
 commute <- mutate(commute,
                   cluster_str = cluster,
@@ -15,46 +15,47 @@ commute <- mutate(commute,
 
 names(schools) <- tolower(names(schools))
 schools <- subset(schools,
-                  select=c(school.year, schoolname, adjusted.school.id,
-                           school.type..state., charter.status,
-                           school.address.location.1, prek.3, prek.4,
-                           preschool, kindergarten, grade.1, grade.2,
-                           grade.3, grade.4, grade.5, grade.6, grade.7,
-                           grade.8, grade.9, grade.10, grade.11, grade.12,
-                           lon, lat))
+                  select=c(school_year, school_name, school_code,
+                           web_site,
+                           school_type_state, charter_status,
+                           school_address_location_1, prek_3, prek_4,
+                           preschool, kindergarten, grade_1, grade_2,
+                           grade_3, grade_4, grade_5, grade_6, grade_7,
+                           grade_8, grade_9, grade_10, grade_11, grade_12,
+                           latitude, longitude, ward, census_tract))
 
 schools <- mutate(schools,
-                  school.year = as.numeric(school.year),
-                  charter.status = charter.status == 'Yes',
-                  prek.3 = prek.3 == 'Y',
-                  prek.4 = prek.4 == 'Y',
+                  school_year = as.numeric(school_year),
+                  charter_status = charter_status == 'Yes',
+                  prek_3 = prek_3 == 'Y',
+                  prek_4 = prek_4 == 'Y',
                   preschool = preschool == 'Y',
                   kindergarten = kindergarten == 'Y',
-                  grade.1 = grade.1 == 'Y',
-                  grade.2 = grade.2 == 'Y',
-                  grade.3 = grade.3 == 'Y',
-                  grade.4 = grade.4 == 'Y',
-                  grade.5 = grade.5 == 'Y',
-                  grade.6 = grade.6 == 'Y',
-                  grade.7 = grade.7 == 'Y',
-                  grade.8 = grade.8 == 'Y',
-                  grade.9 = grade.9 == 'Y',
-                  grade.10 = grade.10 == 'Y',
-                  grade.11 = grade.11 == 'Y',
-                  grade.12 = grade.12 == 'Y'
+                  grade_1 = grade_1 == 'Y',
+                  grade_2 = grade_2 == 'Y',
+                  grade_3 = grade_3 == 'Y',
+                  grade_4 = grade_4 == 'Y',
+                  grade_5 = grade_5 == 'Y',
+                  grade_6 = grade_6 == 'Y',
+                  grade_7 = grade_7 == 'Y',
+                  grade_8 = grade_8 == 'Y',
+                  grade_9 = grade_9 == 'Y',
+                  grade_10 = grade_10 == 'Y',
+                  grade_11 = grade_11 == 'Y',
+                  grade_12 = grade_12 == 'Y',
+                  ward = as.numeric(str_sub(ward, 6))
 )
 
-schools <- rename(schools, c('adjusted.school.id'='school_code',
-                             'school.type..state.'='school_type',
-                             'school.address.location.1'='school_address'))
+schools <- rename(schools, c('school_type_state'='school_type',
+                             'school_address_location_1'='school_address'))
 
 
 dat <- join(commute, schools, type='left')
 
-# one school is mis-geocoded
-# 38.8628, -76.9921
-dat[dat$school_code==1126, 'lon'] <- -76.9921
-dat[dat$school_code==1126, 'lat'] <- 38.8628
+# # one school is mis-geocoded
+# # 38.8628, -76.9921
+# dat[dat$school_code==1126, 'lon'] <- -76.9921
+# dat[dat$school_code==1126, 'lat'] <- 38.8628
 
 #ggplot(dat, aes(lon, lat, color=cluster)) + geom_jitter(position=position_jitter(width=.01,height=.01))
 
