@@ -7,7 +7,7 @@ library(stringr)
 library(rjson)
 
 commute <- read.csv("school-cluster-mapping-2012-v2.csv")
-schools <- read.csv("school-locs3-coded.csv")
+schools <- read.csv("school-locs4-coded.csv")
 
 commute <- mutate(commute,
                   cluster_str = cluster,
@@ -22,7 +22,7 @@ schools <- subset(schools,
                            preschool, kindergarten, grade_1, grade_2,
                            grade_3, grade_4, grade_5, grade_6, grade_7,
                            grade_8, grade_9, grade_10, grade_11, grade_12,
-                           latitude, longitude, ward, census_tract))
+                           mar_latitude, mar_longitude, mar_ward, mar_census_tract))
 
 schools <- mutate(schools,
                   school_year = as.numeric(school_year),
@@ -43,11 +43,15 @@ schools <- mutate(schools,
                   grade_10 = grade_10 == 'Y',
                   grade_11 = grade_11 == 'Y',
                   grade_12 = grade_12 == 'Y',
-                  ward = as.numeric(str_sub(ward, 6))
+                  mar_ward = as.numeric(str_sub(mar_ward, 6))
 )
 
 schools <- rename(schools, c('school_type_state'='school_type',
-                             'school_address_location_1'='school_address'))
+                             'school_address_location_1'='school_address',
+                             'mar_latitude'='latitude',
+                             'mar_longitude'='longitude',
+                             'mar_census_tract'='census_tract',
+                             'mar_ward'='ward'))
 
 
 dat <- join(commute, schools, type='left')
