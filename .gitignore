@@ -9,3 +9,5 @@
 /_layouts/.DS_Store
 data/*.pdf
 data/*.png
+
+mixture.json
