@@ -24,8 +24,8 @@ function getClusters(schoolCode)
           
           cluster.id = data.cluster[key];
           cluster.count = data.count[key];
-          cluster.lat = data.lat[key];
-          cluster.lon = data.lon[key];
+          cluster.lat = data.latitude[key];
+          cluster.lon = data.longitude[key];
           clusters[cluster.id] = cluster;
         }
       });
@@ -52,8 +52,8 @@ function getSchools(clusterId) {
           
           school.school_name = data.school_name[key];
           school.count = data.count[key];
-          school.lat = data.lat[key];
-          school.lon = data.lon[key];
+          school.lat = data.latitude[key];
+          school.lon = data.longitude[key];
           schools.push(school);
         }
       });
