@@ -15,7 +15,7 @@ commutes <- read.csv('commute_data_denorm.csv')
 dat <- merge(commutes, ncs, by.x='cluster', by.y='id', all.x=TRUE)
 
 # do some cleanup
-dat <- subset(dat, !is.na(grade.12) & !is.na(school_type))
+dat <- subset(dat, !is.na(grade_12) & !is.na(school_type))
 capwords <- function(s, strict = FALSE) {
     cap <- function(s) paste(toupper(substring(s, 1, 1)),
 {s <- substring(s, 2); if(strict) tolower(s) else s},
@@ -27,20 +27,20 @@ dat$school_type[dat$school_type=='Magnet School/Vocational Shared Time'] <- 'Mag
 dat$count[dat$count==-1] <- 4 # rough estimate of 1-9
 
 dat <- ddply(dat, .(school_code), mutate, school_count=sum(count))
-dat$level <- factor(with(dat, ifelse(grade.12,'High',ifelse(grade.7,'Middle','Elem'))),
+dat$level <- factor(with(dat, ifelse(grade_12,'High',ifelse(grade_7,'Middle','Elem'))),
                     levels=c('Elem','Middle','High'), ordered=TRUE)
-dat$charter <- ifelse(dat$charter.status, 'Charter', 'Public')
+dat$charter <- ifelse(dat$charter_status, 'Charter', 'Public')
 
-plot.1 <- ggplot(dat, aes(x=lon_ctr,y=lat_ctr,xend=lon,yend=lat,size=count)) + 
+plot.1 <- ggplot(dat, aes(x=lon_ctr,y=lat_ctr,xend=longitude,yend=latitude,size=count)) + 
     geom_segment(alpha=.1) +
-    geom_point(aes(x=lon,y=lat,size=school_count,color=charter.status)) +
+    geom_point(aes(x=longitude,y=latitude,size=school_count,color=charter_status)) +
     facet_wrap(~school_type)
 
 plot.2 <- ggplot(dat, 
-       aes(x=lon_ctr,y=lat_ctr,xend=lon,yend=lat,size=count,alpha=count)) + 
+       aes(x=lon_ctr,y=lat_ctr,xend=longitude,yend=latitude,size=count,alpha=count)) + 
     geom_segment() +
     geom_segment(data=subset(dat, count>50), color='blue') +
-    geom_point(aes(x=lon,y=lat,size=school_count), color='#00B81C') +
+    geom_point(aes(x=longitude,y=latitude,size=school_count), color='#00B81C') +
     scale_size(range=c(1,7)) +
     facet_grid(charter ~ level) +
     xlab('') + ylab('') +
@@ -48,4 +48,15 @@ plot.2 <- ggplot(dat,
 
 ggsave('static_analysis_2.pdf', plot.2, width=10, height=7)
 
+plot.3 <- ggplot(dat, 
+       aes(x=lon_ctr,y=lat_ctr,xend=longitude,yend=latitude,size=count,alpha=count)) + 
+    geom_segment() +
+    geom_segment(data=subset(dat, count>50), color='blue') +
+    geom_point(aes(x=longitude,y=latitude,size=school_count), color='#00B81C') +
+    scale_size(range=c(1,7)) +
+    facet_wrap( ~ ward) +
+    xlab('') + ylab('') +
+    theme_bw() +
+    theme(legend.position='none', axis.text=element_text(size=0), text=element_text(size=20))
 
+ggsave('static_analysis_3.png', plot.3, width=7, height=7)
