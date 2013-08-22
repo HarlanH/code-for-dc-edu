@@ -81,6 +81,6 @@ for (x in 1:8) {
         theme_bw() +
         theme(legend.position='none', axis.text=element_text(size=0),
               axis.ticks=element_line(size=0))
-    ggsave(sprintf('anim_map_ward_%d.png', x), p, width=7, height=7)
+    ggsave(sprintf('anim_map_ward_%d.png', x), p, width=7, height=7,dpi=100)
 }
 
