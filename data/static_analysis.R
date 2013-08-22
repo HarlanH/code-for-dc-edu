@@ -60,3 +60,27 @@ plot.3 <- ggplot(dat,
     theme(legend.position='none', axis.text=element_text(size=0), text=element_text(size=20))
 
 ggsave('static_analysis_3.png', plot.3, width=7, height=7)
+
+# do a version of plot.3, but one ward per separate image, and a map behind
+dc_map <- get_map(location=c(-77.016667, 38.905111), zoom=12, #maptype='toner',
+        source='osm', color='bw')
+
+for (x in 1:8) {
+    dat_ward <- subset(dat, ward==x)
+    p <- ggmap(dc_map, extent='device') +
+        geom_segment(data=dat_ward,
+                     color='blue',
+                     mapping=aes(x=lon_ctr,y=lat_ctr,xend=longitude,yend=latitude,size=count,alpha=count)) +
+        geom_segment(data=subset(dat_ward, count>50), 
+                     color='red',
+                     mapping=aes(x=lon_ctr,y=lat_ctr,xend=longitude,yend=latitude,size=count,alpha=count)) +
+        geom_point(data=dat_ward,
+                   aes(x=longitude,y=latitude,size=school_count), color='gold') +
+        scale_size(range=c(1,7)) +
+        xlab('') + ylab('') +
+        theme_bw() +
+        theme(legend.position='none', axis.text=element_text(size=0),
+              axis.ticks=element_line(size=0))
+    ggsave(sprintf('anim_map_ward_%d.png', x), p, width=7, height=7)
+}
+
