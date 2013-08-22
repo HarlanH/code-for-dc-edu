@@ -11,7 +11,30 @@ title: Open Schools!
       </div>
       <div class="span8">
         <!-- http://stackoverflow.com/questions/11316383/bootstrap-hero-unit-height-leaflet -->
-        <div id="snapshot" style="height: 600px; color: blue"></div>
+        <div id="imgRotator1">
+<ul>
+<li><a href=""><img src="data/anim_map_ward_1.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_2.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_3.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_4.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_5.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_6.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_7.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+<li><a href=""><img src="data/anim_map_ward_8.png" border="0" alt="" title="" width="700" height="700" /></a></li>
+</ul></div>
+<script type="text/javascript">
+  var rotator1_options = {
+       'speed': 2000, //how fast it roates
+       'rate': 1000, //animation rate of the fade
+       'width': '700px', //width of the rotator, minimally should equally image's width
+       'height': '700px' //height of the rotator, minimally should equally image's height
+    };
+
+$('#imgRotator1').imgRotator(rotator1_options);
+//call loadStyle method to add some css
+var rotator1_style = "#imgRotator1 { border: 5px solid #000;} ";
+$('#imgRotator1').imgRotator("loadStyle", "inline", rotator1_style);
+</script>
         <!-- Le javascript
         ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
