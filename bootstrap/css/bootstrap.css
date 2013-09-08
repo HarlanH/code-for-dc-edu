@@ -4819,6 +4819,11 @@ input[type="submit"].btn.btn-mini {
   color: #999999;
 }
 
+.navbar-inverse .navbar-icon {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
 .navbar-inverse .navbar-text {
   color: #999999;
 }
