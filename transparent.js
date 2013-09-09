@@ -26,6 +26,7 @@ function getClusters(schoolCode)
           cluster.count = data.count[key];
           cluster.lat = data.latitude[key];
           cluster.lon = data.longitude[key];
+          cluster.ward = data.ward[key];
           clusters[cluster.id] = cluster;
         }
       });
@@ -54,6 +55,11 @@ function getSchools(clusterId) {
           school.count = data.count[key];
           school.lat = data.latitude[key];
           school.lon = data.longitude[key];
+          school.charter = data.charter_status[key];
+          school.school_type = data.school_type[key];
+          school.elementary_tag = (data.grade_1[key]&&data.grade_2[key]&&data.grade_3[key]&&data.grade_4[key]&&data.grade_5[key]);
+          school.middle_tag = (data.grade_6[key]&&data.grade_7[key]&&data.grade_8[key]);
+          school.high_tag = (data.grade_9[key]&&data.grade_10[key]&&data.grade_11[key]&&data.grade_12[key]);
           schools.push(school);
         }
       });

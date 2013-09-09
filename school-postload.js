@@ -71,11 +71,15 @@ function onEachFeature(feature, layer) {
 }
 
 
-function schoolListSelected() {
+function schoolListSelected(active_ward_name) {
 	var myselect = document.getElementById("schoolsList");
 	var schoolID = myselect.options[myselect.selectedIndex].id;
 	var school_name = myselect.options[myselect.selectedIndex].value;
 	var clusters = getClusters(schoolID);
+        if(active_ward_name == 'find_active'){
+            active_ward_name = $('button[name="ward"].active').val(); 
+        }
+        var active_ward_id=document.getElementById(active_ward_name).value;
 	// clusters[1].lat and .lon should work
 	//console.log(clusters);
 
@@ -83,13 +87,19 @@ function schoolListSelected() {
 	while (school_lines.length > 0) {
             map.removeLayer(school_lines.pop());
 	}
+        
 
 	// change the colors of the NCs
-
 	// draw lines between the school and the NC centers
 	// iterate, plot the points and lines
 	for (i = 0; i < clusters.length; i++) {
-		if (i in clusters && typeof clusters[i].lat === 'number') { // if the _school_ has a location
+            // if the _school_ has a location, ward is selected, 
+            // school public/charter is correct
+            // school elementary/middle/high is correct
+		if (i in clusters && typeof clusters[i].lat === 'number'
+                    && (active_ward_name == "wall" || active_ward_id == clusters[i].ward) 
+                    ){ 
+                    
 			var cluster_id = clusters[i].id
 			var lineseg = L.polyline([[clusters[i].lat, clusters[i].lon], 
 									  [nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
