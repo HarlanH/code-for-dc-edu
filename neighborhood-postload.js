@@ -47,8 +47,30 @@ $(document).ready(function() {
 
 });
 
-// function defs below
-
+// the active attribute doesn't change until after onclick is resolved so it's easier to manually track button state 
+var button_onoff = {
+    "charter":1,
+    "public":1,
+    "elementary":1,
+    "middle":1,
+    "high":1,
+};
+$('.btn-group').on('click', 'button', function(e){     
+        var selected = $(this).attr('value');
+//         console.log(selected);
+        if($(this).hasClass("active")){
+            button_onoff[selected] = 0; 
+            $(this).removeClass("btn-primary");
+            //$(this).addClass("btn-inverse"); 
+//              console.log("deactivating "+selected);
+        }else{
+            $(this).removeClass("btn-inverse");
+            $(this).addClass("btn-primary");
+            button_onoff[selected] = 1; 
+//             console.log("activating "+selected);
+        }
+        displaySchools('none',$(this));
+    });
 
 var first_pass = 1;
 var layer ;
@@ -64,23 +86,8 @@ function displaySchools(e,toggleswitch) {
         toggleswitch = 'none'
 	layer = e.target;
     }
-    // active switches don't toggle until after onclick has already passed
-    // there must be a better way to do the toggleswitch piece
-    var inactive_charter = $('button[name="schoolinfo"].active')
-        .filter('[id="charter"]').val()=="charter" ? 0 : 1 ; 
-    if(toggleswitch == 'togglecharter'){ inactive_charter=inactive_charter+1%2; }
-    var inactive_public = $('button[name="schoolinfo"].active')
-        .filter('[id="public"]').val()=="public" ? 0 : 1 ; 
-    if(toggleswitch == 'togglepublic'){ inactive_public=inactive_public+1%2; }
-    var inactive_elementary = $('button[name="schoolinfo"].active')
-        .filter('[id="elementary"]').val()=="elementary" ? 0 : 1 ; 
-    if(toggleswitch == 'toggleelementary'){ inactive_elementary==inactive_elementary+1%2; }
-    var inactive_middle = $('button[name="schoolinfo"].active')
-        .filter('[id="middle"]').val()=="middle" ? 0 : 1 ; 
-    if(toggleswitch == 'togglemiddle'){ inactive_middle==inactive_middle+1%2; }
-    var inactive_high = $('button[name="schoolinfo"].active')
-        .filter('[id="high"]').val()=="high" ? 0 : 1 ; 
-    if(toggleswitch == 'togglehigh'){ inactive_high==inactive_high+1%2; }
+//     console.log(" button checks: "+ button_onoff["charter"]+" "+button_onoff["public"]+
+//                 " "+button_onoff["elementary"] +" "+ button_onoff["middle"] +" "+ button_onoff["high"]);
 
     // sometimes there will be no lines but a legend because of the filters so first pass is used.
     if (first_pass != 1) {
@@ -101,11 +108,11 @@ function displaySchools(e,toggleswitch) {
             // if the button is off then make sure the school of that class is excluded
             // elementary/middle/high schools are all tagged by a specific grade ranges!
 		if (typeof schools[i].lat === 'number'
-                    && !(inactive_public==1 && schools[i].school_type == 'Regular school')
-                    && !(inactive_charter==1 && schools[i].charter == true )
-                    && !(inactive_elementary==1 && schools[i].elementary_tag == true )
-                    && !(inactive_middle==1     && schools[i].middle_tag == true )
-                    && !(inactive_high==1       && schools[i].high_tag == true )
+                    && !(button_onoff["public"]==0 && schools[i].school_type == 'Regular school')
+                    && !(button_onoff["charter"]==0 && schools[i].charter == true )
+                    && !(button_onoff["elementary"]==0 && schools[i].elementary_tag == true )
+                    && !(button_onoff["middle"]==0     && schools[i].middle_tag == true )
+                    && !(button_onoff["high"]==0       && schools[i].high_tag == true )
                     ) {
 			//var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
 			//marker.addTo(neighmap);
@@ -138,5 +145,4 @@ function onEachFeature(feature, layer) {
         click: displaySchools
     });
 }
-
 
