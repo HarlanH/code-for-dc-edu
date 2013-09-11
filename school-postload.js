@@ -37,6 +37,7 @@ $('.btn-group').on('click', 'button', function(e){
             //$(this).removeClass("btn-inverse");
 //              console.log("activating "+selected);
         }
+        dropdownmenu();
     });
 $('.btn-group2').on('click', 'button', function(e){     
         var selected = $(this).attr('value');
@@ -51,17 +52,18 @@ $('.btn-group2').on('click', 'button', function(e){
         button_onoff["w7"]=0;
         button_onoff["w8"]=0;
         button_onoff[selected] = 1; 
+        dropdownmenu();
     });
 
 function dropdownmenu() {
+    //clear the current content of the select
+    $select.html('');
+    // add instructions
+    $select.append('<option>Pick a School</option>');
+
 	//request the JSON data and parse into the select element
+          //var schools = getAllSchools(); 
 	$.getJSON('data/schools.json', function(data){
-	 
-	  //clear the current content of the select
-	  $select.html('');
-	  // add instructions
-	  $select.append('<option>Pick a School</option>')
-	 
 	  //iterate over the data and append a select option
 	  $.each(data, function(key, val){
 	    $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
