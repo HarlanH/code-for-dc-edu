@@ -5,42 +5,40 @@ title: Schools
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span4">
-      <b>Choose a school to see where its students commute from. 
-        <div>Choose specific wards using the buttons.</div> 
+      <b>Select a school from the dropdown menu to see where its students commute from. 
+        <div>Choose which schools are available through the dropdown menu using the buttons.</div> 
       </b>
-<!---
       <p>
         <div id="systembuttons" class="btn-group " data-toggle="buttons-checkbox">
-          <button id="charter" type="button" class="btn btn-primary active ">Charter</button>
-          <button id="public" type="button" class="btn btn-primary active ">Public</button>
+          <button value="charter" id="charter" type="button" class="btn btn-primary active ">Charter</button>
+          <button value="public" id="public" type="button" class="btn btn-primary active ">Public</button>
         </div>
         <div id="levelsbuttons" class="btn-group " data-toggle="buttons-checkbox">
-          <button id="elementary" type="button" class="btn btn-primary active ">Elementary</button>
-          <button id="middle" type="button" class="btn btn-primary active ">Middle</button>
-          <button id="high" type="button" class="btn btn-primary active ">High</button>
+          <button value="elementary" id="elementary" type="button" class="btn btn-primary active ">Elementary</button>
+          <button value="middle" id="middle" type="button" class="btn btn-primary active ">Middle</button>
+          <button value="high" id="high" type="button" class="btn btn-primary active ">High</button>
         </div>
       </p>
---->
       <p>
-        <div id="wardsbuttons" class="btn-group" data-toggle="buttons-radio">
-          <button name="ward" value="wall" id="wall" type="button" class="btn active" 
-                  onclick="schoolListSelected('wall')">All Wards</button>
-          <button name="ward" value=1   id="w1" type="button" class="btn" 
-                  onclick="schoolListSelected('w1')">1</button>
-          <button name="ward" value=2   id="w2" type="button" class="btn" 
-                  onclick="schoolListSelected('w2')">2</button>
-          <button name="ward" value=3   id="w3" type="button" class="btn" 
-                  onclick="schoolListSelected('w3')">3</button>
-          <button name="ward" value=4   id="w4" type="button" class="btn" 
-                  onclick="schoolListSelected('w4')">4</button>
-          <button name="ward" value=5   id="w5" type="button" class="btn" 
-                  onclick="schoolListSelected('w5')">5</button>
-          <button name="ward" value=6   id="w6" type="button" class="btn" 
-                  onclick="schoolListSelected('w6')">6</button>
-          <button name="ward" value=7   id="w7" type="button" class="btn" 
-                  onclick="schoolListSelected('w7')">7</button>
-          <button name="ward" value=8   id="w8" type="button" class="btn" 
-                  onclick="schoolListSelected('w8')">8</button>
+        <div id="wardsbuttons" class="btn-group2" data-toggle="buttons-radio">
+          <button name="ward" value="allwards" id="allwards" type="button" class="btn active" 
+                  > All Wards</button>
+          <button name="ward" value="w1"   id="w1" type="button" class="btn" 
+                  > 1</button>
+          <button name="ward" value="w2"   id="w2" type="button" class="btn" 
+                  > 2</button>
+          <button name="ward" value="w3"   id="w3" type="button" class="btn" 
+                  > 3</button>
+          <button name="ward" value="w4"   id="w4" type="button" class="btn" 
+                  > 4</button>
+          <button name="ward" value="w5"   id="w5" type="button" class="btn" 
+                  > 5</button>
+          <button name="ward" value="w6"   id="w6" type="button" class="btn" 
+                  > 6</button>
+          <button name="ward" value="w7"   id="w7" type="button" class="btn" 
+                  > 7</button>
+          <button name="ward" value="w8"   id="w8" type="button" class="btn" 
+                  > 8</button>
         </div>
       </p>
       <!--- starting with all wards and all schools active --->

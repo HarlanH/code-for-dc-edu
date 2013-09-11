@@ -8,13 +8,52 @@ var infobox = L.control();
 var legend = L.control({position: 'bottomleft'});
 
 
-// the document's ready, so we can do stuff to it
-$(document).ready(function() {
-	L.tileLayer(tileString, {
-	    maxZoom: 18,
-	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
-	}).addTo(map);
+// the active attribute doesn't change until after onclick is resolved so it's easier to manually track button state 
+var button_onoff = {
+    "charter":1,
+    "public":1,
+    "elementary":1,
+    "middle":1,
+    "high":1,
+    "allwards":1,
+    "w1":0,
+    "w2":0,
+    "w3":0,
+    "w4":0,
+    "w5":0,
+    "w7":0,
+    "w8":0
+};
+$('.btn-group').on('click', 'button', function(e){     
+        var selected = $(this).attr('value');
+//         console.log(selected);
+        if($(this).hasClass("active")){
+            $(this).removeClass("btn-primary");
+            //$(this).addClass("btn-inverse"); 
+//               console.log("deactivating "+selected);
+        }else{
+            button_onoff[selected] = 1; 
+            $(this).addClass("btn-primary");
+            //$(this).removeClass("btn-inverse");
+//              console.log("activating "+selected);
+        }
+    });
+$('.btn-group2').on('click', 'button', function(e){     
+        var selected = $(this).attr('value');
+//         console.log(selected);
+        button_onoff["allwards"]=0;
+        button_onoff["w1"]=0;
+        button_onoff["w2"]=0;
+        button_onoff["w3"]=0;
+        button_onoff["w4"]=0;
+        button_onoff["w5"]=0;
+        button_onoff["w6"]=0;
+        button_onoff["w7"]=0;
+        button_onoff["w8"]=0;
+        button_onoff[selected] = 1; 
+    });
 
+function dropdownmenu() {
 	//request the JSON data and parse into the select element
 	$.getJSON('data/schools.json', function(data){
 	 
@@ -28,7 +67,16 @@ $(document).ready(function() {
 	    $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
 	  })
 	});
-
+}
+// the document's ready, so we can do stuff to it
+$(document).ready(function() {
+	L.tileLayer(tileString, {
+	    maxZoom: 18,
+	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+	}).addTo(map);
+        
+        dropdownmenu();
+        
 	$.getJSON('clusters.geojson', function(data){
 	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
 	});
@@ -71,15 +119,11 @@ function onEachFeature(feature, layer) {
 }
 
 
-function schoolListSelected(active_ward_name) {
+function schoolListSelected() {
 	var myselect = document.getElementById("schoolsList");
 	var schoolID = myselect.options[myselect.selectedIndex].id;
 	var school_name = myselect.options[myselect.selectedIndex].value;
 	var clusters = getClusters(schoolID);
-        if(active_ward_name == 'find_active'){
-            active_ward_name = $('button[name="ward"].active').val(); 
-        }
-        var active_ward_id=document.getElementById(active_ward_name).value;
 	// clusters[1].lat and .lon should work
 	//console.log(clusters);
 
@@ -93,13 +137,8 @@ function schoolListSelected(active_ward_name) {
 	// draw lines between the school and the NC centers
 	// iterate, plot the points and lines
 	for (i = 0; i < clusters.length; i++) {
-            // if the _school_ has a location, ward is selected, 
-            // school public/charter is correct
-            // school elementary/middle/high is correct
-		if (i in clusters && typeof clusters[i].lat === 'number'
-                    && (active_ward_name == "wall" || active_ward_id == clusters[i].ward) 
-                    ){ 
-                    
+            // if the _school_ has a location
+		if (i in clusters && typeof clusters[i].lat === 'number'){ 
 			var cluster_id = clusters[i].id
 			var lineseg = L.polyline([[clusters[i].lat, clusters[i].lon], 
 									  [nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],

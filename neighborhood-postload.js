@@ -64,9 +64,9 @@ $('.btn-group').on('click', 'button', function(e){
             //$(this).addClass("btn-inverse"); 
 //              console.log("deactivating "+selected);
         }else{
-            $(this).removeClass("btn-inverse");
-            $(this).addClass("btn-primary");
             button_onoff[selected] = 1; 
+            //$(this).removeClass("btn-inverse");
+            $(this).addClass("btn-primary");
 //             console.log("activating "+selected);
         }
         displaySchools('none',$(this));
