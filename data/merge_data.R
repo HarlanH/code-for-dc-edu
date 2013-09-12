@@ -67,3 +67,19 @@ write.csv(dat, file='commute_data_denorm.csv')
 
 dat.json <- toJSON(dat)
 cat(dat.json, file='commute_data_denorm.json')
+
+# make nice verstion of the schools list to be loaded
+schools <- mutate(schools,
+                  elementary = grade_1 | grade_2 | grade_3 | grade_4 | grade_5,
+                  middle = grade_6 | grade_7 | grade_8,
+                  high = grade_9 | grade_10 | grade_11 | grade_12)
+
+schools_nice <- subset(schools, select=c('school_name', 'school_code',
+                                         'web_site', 'school_type',
+                                         'charter_status', 'school_address',
+                                         'ward', 'census_tract',
+                                         'elementary', 'middle', 'high'))
+schools_nice <- schools_nice[order(schools_nice$school_name), ]
+cat(toJSON(alply(schools_nice, 1, 
+                 function(rr) as.list(rr)))
+    , file='schools.json')
