@@ -47,18 +47,53 @@ $(document).ready(function() {
 
 });
 
-// function defs below
+// the active attribute doesn't change until after onclick is resolved so it's easier to manually track button state 
+var button_onoff = {
+    "charter":1,
+    "public":1,
+    "elementary":1,
+    "middle":1,
+    "high":1,
+};
+$('.btn-group').on('click', 'button', function(e){     
+        var selected = $(this).attr('value');
+//         console.log(selected);
+        if($(this).hasClass("active")){
+            button_onoff[selected] = 0; 
+            $(this).removeClass("btn-primary");
+            //$(this).addClass("btn-inverse"); 
+//              console.log("deactivating "+selected);
+        }else{
+            button_onoff[selected] = 1; 
+            //$(this).removeClass("btn-inverse");
+            $(this).addClass("btn-primary");
+//             console.log("activating "+selected);
+        }
+        displaySchools('none',$(this));
+    });
 
+var first_pass = 1;
+var layer ;
+function displaySchools(e,toggleswitch) {
+    if(e == 'none'){
+        // this happens if the click comes from buttons
+        if(first_pass == 1){
+            //if buttons activate this script for the first time there is 
+            // no school layer to modify yet -- return;
+            return; 
+        }
+    }else{
+        toggleswitch = 'none'
+	layer = e.target;
+    }
+//     console.log(" button checks: "+ button_onoff["charter"]+" "+button_onoff["public"]+
+//                 " "+button_onoff["elementary"] +" "+ button_onoff["middle"] +" "+ button_onoff["high"]);
 
-
-
-function displaySchools(e) {
-	var layer = e.target;
-
-	if (school_lines.length > 0) {
+    // sometimes there will be no lines but a legend because of the filters so first pass is used.
+    if (first_pass != 1) {
         legend.removeFrom(neighmap);
     }
-    legend.addTo(neighmap);
+    legend.addTo(neighmap); first_pass = 0;
 	// wipe any old school lines
 	while (school_lines.length > 0) {
             neighmap.removeLayer(school_lines.pop());
@@ -70,7 +105,19 @@ function displaySchools(e) {
 	//console.log(schools);
 	// iterate, plot the points and lines
 	for (i = 0; i < schools.length; i++) {
-		if (typeof schools[i].lat === 'number') {
+		if (typeof schools[i].lat != 'number') {
+			continue;
+		}
+        // if the button is off then make sure the school of that class is excluded
+        // elementary/middle/high schools are all tagged by a specific grade ranges!
+        // logic: show the school if none of the tags match an off button
+        var show_school = 
+        	!(((button_onoff["public"]==0) && !schools[i].charter) ||
+              ((button_onoff["charter"]==0) && schools[i].charter) ||
+              ((button_onoff["elementary"]==0) && schools[i].elementary_tag) ||
+              ((button_onoff["middle"]==0) && schools[i].middle_tag) ||
+              ((button_onoff["high"]==0) && schools[i].high_tag))
+		if (show_school) {
 			//var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
 			//marker.addTo(neighmap);
 			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
@@ -102,5 +149,4 @@ function onEachFeature(feature, layer) {
         click: displaySchools
     });
 }
-
 
