@@ -28,6 +28,7 @@ $('.btn-group').on('click', 'button', function(e){
         var selected = $(this).attr('value');
 //         console.log(selected);
         if($(this).hasClass("active")){
+        	button_onoff[selected] = 0; 
             $(this).removeClass("btn-primary");
             //$(this).addClass("btn-inverse"); 
 //               console.log("deactivating "+selected);
@@ -64,11 +65,30 @@ function dropdownmenu() {
 	//request the JSON data and parse into the select element
           //var schools = getAllSchools(); 
 	$.getJSON('data/schools.json', function(data){
+		log(button_onoff);
 	  //iterate over the data and append a select option
 	  $.each(data, function(key, val){
-	    $select.append('<option id="' + val.school_code + '">' + val.schoolname + '</option>');
+	  	if ((val.charter_status && button_onoff["charter"]) ||
+	  		(!val.charter_status && button_onoff["public"])) {
+	  		if ((val.elementary && button_onoff["elementary"]) ||
+	  			(val.middle && button_onoff["middle"]) ||
+	  			(val.high && button_onoff["high"])) {
+	  			if (button_onoff["allwards"] ||
+	  				(val.ward == 1 && button_onoff["w1"]) ||
+	  				(val.ward == 2 && button_onoff["w2"]) ||
+	  				(val.ward == 3 && button_onoff["w3"]) ||
+	  				(val.ward == 4 && button_onoff["w4"]) ||
+	  				(val.ward == 5 && button_onoff["w5"]) ||
+	  				(val.ward == 6 && button_onoff["w6"]) ||
+	  				(val.ward == 7 && button_onoff["w7"]) ||
+	  				(val.ward == 8 && button_onoff["w8"])) {
+	  				$select.append('<option id="' + val.school_code + '">' + val.school_name + '</option>');
+	  			}
+	  		}
+	  	}
 	  })
 	});
+
 }
 // the document's ready, so we can do stuff to it
 $(document).ready(function() {

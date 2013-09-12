@@ -105,15 +105,19 @@ function displaySchools(e,toggleswitch) {
 	//console.log(schools);
 	// iterate, plot the points and lines
 	for (i = 0; i < schools.length; i++) {
-            // if the button is off then make sure the school of that class is excluded
-            // elementary/middle/high schools are all tagged by a specific grade ranges!
-		if (typeof schools[i].lat === 'number'
-                    && !(button_onoff["public"]==0 && schools[i].school_type == 'Regular school')
-                    && !(button_onoff["charter"]==0 && schools[i].charter == true )
-                    && !(button_onoff["elementary"]==0 && schools[i].elementary_tag == true )
-                    && !(button_onoff["middle"]==0     && schools[i].middle_tag == true )
-                    && !(button_onoff["high"]==0       && schools[i].high_tag == true )
-                    ) {
+		if (typeof schools[i].lat != 'number') {
+			continue;
+		}
+        // if the button is off then make sure the school of that class is excluded
+        // elementary/middle/high schools are all tagged by a specific grade ranges!
+        // logic: show the school if none of the tags match an off button
+        var show_school = 
+        	!(((button_onoff["public"]==0) && !schools[i].charter) ||
+              ((button_onoff["charter"]==0) && schools[i].charter) ||
+              ((button_onoff["elementary"]==0) && schools[i].elementary_tag) ||
+              ((button_onoff["middle"]==0) && schools[i].middle_tag) ||
+              ((button_onoff["high"]==0) && schools[i].high_tag))
+		if (show_school) {
 			//var marker = L.circleMarker([schools[i].lat, schools[i].lon], {radius: 5+((schools[i].count<10)?0:Math.sqrt(schools[i].count))});
 			//marker.addTo(neighmap);
 			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
