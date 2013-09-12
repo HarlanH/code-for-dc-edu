@@ -5,36 +5,44 @@ title: Schools
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span4">
-      <b>Choose a school to see where its students commute from. 
-        <div style='color:#DDDDDD'>Unselect the buttons to
-        see fewer schools in the list.</div>
+      <b>Select a school from the dropdown menu to see where its students commute from. 
+        <div>Choose which schools are available through the dropdown menu using the buttons.</div> 
       </b>
       <p>
         <div id="systembuttons" class="btn-group " data-toggle="buttons-checkbox">
-          <button id="charter" type="button" class="btn btn-primary active btn-disabled">Charter</button>
-          <button id="public" type="button" class="btn btn-primary active btn-disabled">Public</button>
+          <button value="charter" id="charter" type="button" class="btn btn-primary active ">Charter</button>
+          <button value="public" id="public" type="button" class="btn btn-primary active ">Public</button>
         </div>
-        <div id="levelsbuttons" class="btn-group btn-disabled" data-toggle="buttons-checkbox">
-          <button id="elementary" type="button" class="btn btn-primary active btn-disabled">Elementary</button>
-          <button id="middle" type="button" class="btn btn-primary active btn-disabled">Middle</button>
-          <button id="high" type="button" class="btn btn-primary active btn-disabled">High</button>
+        <div id="levelsbuttons" class="btn-group " data-toggle="buttons-checkbox">
+          <button value="elementary" id="elementary" type="button" class="btn btn-primary active ">Elementary</button>
+          <button value="middle" id="middle" type="button" class="btn btn-primary active ">Middle</button>
+          <button value="high" id="high" type="button" class="btn btn-primary active ">High</button>
         </div>
       </p>
       <p>
-        <div id="wardsbuttons" class="btn-group btn-disabled" data-toggle="buttons-radio">
-          <button id="wall" type="button" class="btn active btn-disabled">All Wards</button>
-          <button id="w1" type="button" class="btn btn-disabled">1</button>
-          <button id="w2" type="button" class="btn btn-disabled">2</button>
-          <button id="w3" type="button" class="btn btn-disabled">3</button>
-          <button id="w4" type="button" class="btn btn-disabled">4</button>
-          <button id="w5" type="button" class="btn btn-disabled">5</button>
-          <button id="w6" type="button" class="btn btn-disabled">6</button>
-          <button id="w7" type="button" class="btn btn-disabled">7</button>
-          <button id="w8" type="button" class="btn btn-disabled">8</button>
+        <div id="wardsbuttons" class="btn-group2" data-toggle="buttons-radio">
+          <button name="ward" value="allwards" id="allwards" type="button" class="btn active" 
+                  > All Wards</button>
+          <button name="ward" value="w1"   id="w1" type="button" class="btn" 
+                  > 1</button>
+          <button name="ward" value="w2"   id="w2" type="button" class="btn" 
+                  > 2</button>
+          <button name="ward" value="w3"   id="w3" type="button" class="btn" 
+                  > 3</button>
+          <button name="ward" value="w4"   id="w4" type="button" class="btn" 
+                  > 4</button>
+          <button name="ward" value="w5"   id="w5" type="button" class="btn" 
+                  > 5</button>
+          <button name="ward" value="w6"   id="w6" type="button" class="btn" 
+                  > 6</button>
+          <button name="ward" value="w7"   id="w7" type="button" class="btn" 
+                  > 7</button>
+          <button name="ward" value="w8"   id="w8" type="button" class="btn" 
+                  > 8</button>
         </div>
       </p>
-      
-      <select id="schoolsList" name="schoolsList" onchange="schoolListSelected()"></select>
+      <!--- starting with all wards and all schools active --->
+      <select id="schoolsList" name="schoolsList" onchange="schoolListSelected('find_active')"></select>
 
     </div>
     <div class="span8">
