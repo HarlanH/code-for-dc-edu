@@ -54,7 +54,7 @@ schools <- rename(schools, c('school_type_state'='school_type',
                              'mar_ward'='ward'))
 
 
-dat <- join(commute, schools, type='left')
+dat <- join(commute, schools, type='left', by='school_code')
 
 # # one school is mis-geocoded
 # # 38.8628, -76.9921

@@ -102,7 +102,7 @@ function displaySchools(e,toggleswitch) {
 	var cluster_id = parseInt(layer.feature.properties.GIS_ID.substring(8));
 	//console.log(cluster_id);
 	var schools = getSchools(cluster_id);
-	//console.log(schools);
+	//log(schools);
 	// iterate, plot the points and lines
 	for (i = 0; i < schools.length; i++) {
 		if (typeof schools[i].lat != 'number') {
