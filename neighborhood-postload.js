@@ -4,7 +4,6 @@ var infobox = L.control();
 var school_lines = new Array(); 
 var geojson;
 var legend = L.control({position: 'bottomleft'});
-var layerCount = 3;
 
 // the document's ready, so we can do stuff to it
 $(document).ready(function() {
