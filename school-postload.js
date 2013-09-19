@@ -147,7 +147,7 @@ function schoolListSelected() {
 	var school_name = myselect.options[myselect.selectedIndex].value;
 	var clusters = getClusters(schoolID);
 	// clusters[1].lat and .lon should work
-	//console.log(clusters);
+	log(clusters);
 
 	// wipe any old school lines
 	while (school_lines.length > 0) {
@@ -181,7 +181,10 @@ function schoolListSelected() {
 			school_lines.push(lineseg);
 
 			//lineseg.bindPopup(schools[i].school_name + ": " + ((schools[i].count<10)?"few":schools[i].count) + " students")
-		} // TODO: log that we've got a school iwth no location!
+		} else {
+			// log that we've got a school iwth no location! (common -- skip for now)
+			//log("error:", i, clusters[i]);
+		}
 	}
 
 	// drop a pushpin on the school
