@@ -4,6 +4,7 @@ var infobox = L.control();
 var school_lines = new Array(); 
 var geojson;
 var legend = L.control({position: 'bottomleft'});
+var layerCount = 3;
 
 // the document's ready, so we can do stuff to it
 $(document).ready(function() {
@@ -28,6 +29,7 @@ $(document).ready(function() {
 
 	$.getJSON('clusters.geojson', function(data){
 	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(neighmap);
+		updateIfHashedLink();
 	});
 
 
@@ -43,9 +45,16 @@ $(document).ready(function() {
 	    }
 	    return div;
 	};
-
-
 });
+
+function updateIfHashedLink() {
+	if (window.location.hash) {
+		var id = window.location.hash.split('#')[1],
+		gisified = "00000000" + id;
+		evt = {target:{feature:{properties:{GIS_ID:gisified}}}};
+		displaySchools(evt);
+	}
+}
 
 // the active attribute doesn't change until after onclick is resolved so it's easier to manually track button state 
 var button_onoff = {

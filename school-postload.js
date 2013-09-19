@@ -86,18 +86,31 @@ function dropdownmenu() {
 	  			}
 	  		}
 	  	}
-	  })
-	});
+	  });
 
+	  updateIfHashedLink();
+	});
 }
+
+function updateIfHashedLink() {
+	if (window.location.hash) {
+		var id = window.location.hash.split('#')[1],
+		menu = document.getElementById("schoolsList");
+		for (var i = 0; i < menu.options.length; i++) {
+			if (menu.options[i].id == id) {
+				menu.selectedIndex = i;
+				menu.onchange();
+			}
+		}
+	}
+}
+
 // the document's ready, so we can do stuff to it
 $(document).ready(function() {
 	L.tileLayer(tileString, {
 	    maxZoom: 18,
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 	}).addTo(map);
-        
-        dropdownmenu();
         
 	$.getJSON('clusters.geojson', function(data){
 	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
@@ -128,6 +141,8 @@ $(document).ready(function() {
 	    return div;
 	};
 	legend.addTo(map);
+        
+    dropdownmenu();
 });
 
 // function defs below
