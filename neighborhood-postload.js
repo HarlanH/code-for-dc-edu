@@ -123,6 +123,7 @@ function displaySchools(e,toggleswitch) {
 			var lineseg = L.polyline([[schools[i].lat, schools[i].lon], 
 									  [nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
 				{
+					id: schools[i].school_code,
 					weight: 3+((schools[i].count<10)?0:Math.sqrt(schools[i].count/4.0)),
 					orig_weight: 3+((schools[i].count<10)?0:Math.sqrt(schools[i].count/4.0)),
 				  	opacity: line_opacity(schools[i].count),
@@ -134,7 +135,7 @@ function displaySchools(e,toggleswitch) {
 
 			lineseg.addTo(neighmap);
 
-			lineseg.on({ mouseover: highlightLine, mouseout: resetLine });
+			lineseg.on({ mouseover: highlightLine, mouseout: resetLine, click: clickLine });
 
 			school_lines.push(lineseg);
 
@@ -150,3 +151,7 @@ function onEachFeature(feature, layer) {
     });
 }
 
+function clickLine(e) {
+	var url = "/school.html#" + e.target.options.id;
+	window.location.href = url;
+}
