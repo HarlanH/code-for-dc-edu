@@ -50,7 +50,7 @@ $(document).ready(function() {
 function updateIfHashedLink() {
 	if (window.location.hash) {
 		var id = window.location.hash.split('#')[1],
-		gisified = "00000000" + id;
+		gisified = "00000000" + id,
 		evt = {target:{feature:{properties:{GIS_ID:gisified}}}};
 		displaySchools(evt);
 	}
