@@ -4,6 +4,7 @@ var $select = $('#schoolsList');
 var schoolmarker = new Array(); 
 var geojson;
 var school_lines = new Array(); 
+var school_lines_layerGroup = L.layerGroup();
 var infobox = L.control();
 var legend = L.control({position: 'bottomleft'});
 
@@ -114,6 +115,7 @@ $(document).ready(function() {
         
 	$.getJSON('clusters.geojson', function(data){
 	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
+      school_lines_layerGroup.addTo(map);
 	});
 	
 	infobox.onAdd = function (map) {
@@ -166,7 +168,7 @@ function schoolListSelected() {
 
 	// wipe any old school lines
 	while (school_lines.length > 0) {
-            map.removeLayer(school_lines.pop());
+            school_lines_layerGroup.removeLayer(school_lines.pop());
 	}
         
 
@@ -190,7 +192,7 @@ function schoolListSelected() {
 				 	txt: nc_centers.names[cluster_id-1] + " -> " + school_name + ": " + ((clusters[i].count<10)?"few":clusters[i].count) + " students" 
 				});
 
-			lineseg.addTo(map);
+			lineseg.addTo(school_lines_layerGroup);
 
 			lineseg.on({ mouseover: highlightLine, mouseout: resetLine, click: clickLine });
 
