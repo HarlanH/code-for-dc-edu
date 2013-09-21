@@ -4,6 +4,7 @@ var $select = $('#schoolsList');
 var schoolmarker = new Array(); 
 var geojson;
 var school_lines = new Array(); 
+var school_lines_layerGroup = L.layerGroup();
 var infobox = L.control();
 var legend = L.control({position: 'bottomleft'});
 
@@ -86,10 +87,25 @@ function dropdownmenu() {
 	  			}
 	  		}
 	  	}
-	  })
-	});
+	  });
 
+	  updateIfHashedLink();
+	});
 }
+
+function updateIfHashedLink() {
+	if (window.location.hash) {
+		var id = window.location.hash.split('#')[1],
+		menu = document.getElementById("schoolsList");
+		for (var i = 0; i < menu.options.length; i++) {
+			if (menu.options[i].id == id) {
+				menu.selectedIndex = i;
+				menu.onchange();
+			}
+		}
+	}
+}
+
 // the document's ready, so we can do stuff to it
 $(document).ready(function() {
 	L.tileLayer(tileString, {
@@ -97,10 +113,9 @@ $(document).ready(function() {
 	    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
 	}).addTo(map);
         
-        dropdownmenu();
-        
 	$.getJSON('clusters.geojson', function(data){
 	    geojson = L.geoJson(data, {style: style, onEachFeature: onEachFeature}).addTo(map);
+      school_lines_layerGroup.addTo(map);
 	});
 	
 	infobox.onAdd = function (map) {
@@ -128,6 +143,8 @@ $(document).ready(function() {
 	    return div;
 	};
 	legend.addTo(map);
+        
+    dropdownmenu();
 });
 
 // function defs below
@@ -151,7 +168,7 @@ function schoolListSelected() {
 
 	// wipe any old school lines
 	while (school_lines.length > 0) {
-            map.removeLayer(school_lines.pop());
+            school_lines_layerGroup.removeLayer(school_lines.pop());
 	}
         
 
@@ -165,6 +182,7 @@ function schoolListSelected() {
 			var lineseg = L.polyline([[clusters[i].lat, clusters[i].lon], 
 									  [nc_centers.lat_ctr[cluster_id-1], nc_centers.lon_ctr[cluster_id-1]]],
 				{
+					id: cluster_id,
 					weight: 3+((clusters[i].count<10)?0:Math.sqrt(clusters[i].count/4.0)),
 					orig_weight: 3+((clusters[i].count<10)?0:Math.sqrt(clusters[i].count/4.0)),
 				  	opacity: line_opacity(clusters[i].count),
@@ -174,9 +192,9 @@ function schoolListSelected() {
 				 	txt: nc_centers.names[cluster_id-1] + " -> " + school_name + ": " + ((clusters[i].count<10)?"few":clusters[i].count) + " students" 
 				});
 
-			lineseg.addTo(map);
+			lineseg.addTo(school_lines_layerGroup);
 
-			lineseg.on({ mouseover: highlightLine, mouseout: resetLine });
+			lineseg.on({ mouseover: highlightLine, mouseout: resetLine, click: clickLine });
 
 			school_lines.push(lineseg);
 
@@ -185,6 +203,11 @@ function schoolListSelected() {
 			// log that we've got a school iwth no location! (common -- skip for now)
 			//log("error:", i, clusters[i]);
 		}
+	}
+
+	function clickLine(e) {
+		var url = "/neighborhood.html#" + e.target.options.id;
+		window.location.href = url;
 	}
 
 	// drop a pushpin on the school

@@ -52,6 +52,7 @@ function getSchools(clusterId) {
           school = {};
           
           school.school_name = data.school_name[key];
+          school.school_code = data.school_code[key];
           school.count = data.count[key];
           school.lat = data.latitude[key];
           school.lon = data.longitude[key];
