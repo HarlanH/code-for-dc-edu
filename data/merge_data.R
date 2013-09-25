@@ -70,7 +70,7 @@ cat(dat.json, file='commute_data_denorm.json')
 
 # make nice verstion of the schools list to be loaded
 schools <- mutate(schools,
-                  elementary = grade_1 | grade_2 | grade_3 | grade_4 | grade_5,
+                  elementary = prek_3 | prek_4 | kindergarten | grade_1 | grade_2 | grade_3 | grade_4 | grade_5,
                   middle = grade_6 | grade_7 | grade_8,
                   high = grade_9 | grade_10 | grade_11 | grade_12)
 
