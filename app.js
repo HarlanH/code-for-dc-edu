@@ -21,18 +21,33 @@ var data,
 
     // Construct with map = new Map(element); where element is the ID of a DOM element.
     //
+    // Inherits from Leaflet's L.Map.
+    //
     // PUBLIC METHODS
     //
     // map.displayEdges(filter)
     // Adds all edges matching the filter to the map. Generally expects to see
     // at least "school_code" or "cluster" included in the filter parameters.
     // E.g. -> map.displayEdges({"cluster": 6})
+    //
+    // PROPERTIES
+    //
+    // map.clusters
+    // A Leaflet geoJSON layer containing all of the neighborhood clusters.
+    //
+    // map.edges
+    // A layer for the edge polylines. Clear with map.edges.clearLayers().
+    //
+    // map.edgeOrigin
+    // Indicates whether displayed edges are originating from a "school" or a "cluster".
+    //
+    // map.infobox
+    // A Leaflet control for tooltip info. Update with map.infobox.update(string).
+    //
+    // map.legend
+    // A Leaflet control depicting edge colors. Hidden by default. Reveal with map.legend.show().
 
-    newMap,
-
-    // For testing.
-
-    utils,
+    utils;
 
     // UTILITY FUNCTIONS
     //
@@ -49,19 +64,17 @@ var data,
     // utils.lineOpacity(number)
     // Returns the corresponding opacity for a given value.
 
-    ATTRIBUTION = "Map data &copy;<a href='http://openstreetmap.org'>OpenStreetMap</a> contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery &copy;<a href='http://cloudmade.com'>CloudMade</a>",
-    TILE_URL = "http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/53124/256/{z}/{x}/{y}.png",
-    CLUSTERS_URL = "clusters.geojson",
-    CLUSTER_CENTERS_URL = "data/nc_names_centers.json",
-    SCHOOLS_URL = "data/schools.json",
-    EDGES_URL = "data/commute_data_denorm.json";
-
 (function () {
     "use strict";
 
-    $(function () {
-        newMap = new Map('newMap');
-    });
+    // "Global" Variables
+
+    var ATTRIBUTION = "Map data &copy;<a href='http://openstreetmap.org'>OpenStreetMap</a> contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery &copy;<a href='http://cloudmade.com'>CloudMade</a>",
+        TILE_URL = "http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/53124/256/{z}/{x}/{y}.png",
+        CLUSTERS_URL = "clusters.geojson",
+        CLUSTER_CENTERS_URL = "data/nc_names_centers.json",
+        SCHOOLS_URL = "data/schools.json",
+        EDGES_URL = "data/commute_data_denorm.json";
 
     data = (function () {
         var clusters, getClusters,
@@ -154,10 +167,10 @@ var data,
         this.clusters = L.geoJson(data.clusters(), {
             map: this,
             style: {
-                fillColor: '#3875A3',
+                fillColor: "#3875A3",
                 weight: 2,
                 opacity: 0.7,
-                color: '#12446A',
+                color: "#12446A",
                 fillOpacity: 0.5
             },
             onEachFeature: function (feature, layer) {
@@ -186,11 +199,10 @@ var data,
         }).addTo(this);
 
         this.edges = L.layerGroup().addTo(this);
-        this.edgeOrigin = "cluster";
 
         this.infobox = L.control();
         this.infobox.onAdd = function () {
-            this.div = L.DomUtil.create('div', 'info');
+            this.div = L.DomUtil.create("div", "info");
             this.update();
             return this.div;
         };
@@ -199,10 +211,10 @@ var data,
         };
         this.infobox.addTo(this);
 
-        this.legend = L.control({position: 'bottomleft'});
+        this.legend = L.control({position: "bottomleft"});
         this.legend.onAdd = function () {
             var that = this;
-            this.div = L.DomUtil.create('div', 'info legend');
+            this.div = L.DomUtil.create("div", "info legend");
             _(utils.grades).each(function (grade, i) {
                 if (i !== 0) { that.div.innerHTML += "&ndash;" + grade + "<br>"; }
                 that.div.innerHTML +=
@@ -213,6 +225,7 @@ var data,
         };
         this.legend.addTo(this);
         $(this.legend.div).hide();
+        this.legend.show = function () { $(this.div).show(); };
     };
 
     Map.prototype = L.Map.prototype;
@@ -255,7 +268,7 @@ var data,
             var props, weight, opacity, color, text, lineseg,
                 cluster = _.where(data.clusters().features, {"id": edge.cluster})[0];
 
-            if (cluster && typeof edge.latitude === 'number') {
+            if (cluster && typeof edge.latitude === "number") {
                 props = cluster.properties;
                 weight = 3 + ((edge.count < 10) ? 0 : Math.sqrt(edge.count / 4.0));
                 opacity = utils.lineOpacity(edge.count);
@@ -282,7 +295,7 @@ var data,
             }
         });
 
-        $(this.legend.div).show();
+        this.legend.show();
     };
 
     utils = {
@@ -306,13 +319,13 @@ var data,
 
         getColor: function (d) {
             /*jslint white: true */
-            return d > utils.grades[6] ? '#800026':
-                   d > utils.grades[5] ? '#BD0026':
-                   d > utils.grades[4] ? '#E31A1C':
-                   d > utils.grades[3] ? '#FC4E2A':
-                   d > utils.grades[2] ? '#FD8D3C':
-                   d > utils.grades[1] ? '#FEB24C':
-                                         '#FFEDA0';
+            return d > utils.grades[6] ? "#800026":
+                   d > utils.grades[5] ? "#BD0026":
+                   d > utils.grades[4] ? "#E31A1C":
+                   d > utils.grades[3] ? "#FC4E2A":
+                   d > utils.grades[2] ? "#FD8D3C":
+                   d > utils.grades[1] ? "#FEB24C":
+                                         "#FFEDA0";
         },
 
         lineOpacity: function (d) {
