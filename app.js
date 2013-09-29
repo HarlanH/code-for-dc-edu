@@ -36,7 +36,7 @@ var data,
     // A Leaflet geoJSON layer containing all of the neighborhood clusters.
     //
     // map.edges
-    // A layer for the edge polylines. Clear with map.edges.clearLayers().
+    // A layergroup for the edge polylines. Clear with map.edges.clearLayers().
     //
     // map.edgeOrigin
     // Indicates whether displayed edges are originating from a "school" or a "cluster".
@@ -47,13 +47,16 @@ var data,
     // map.legend
     // A Leaflet control depicting edge colors. Hidden by default. Reveal with map.legend.show().
 
-    utils;
+    utils,
 
     // UTILITY FUNCTIONS
     //
     // utils.oa2ao(object)
     // Takes an object of arrays and translates it into an
     // array of objects, which is more easily manipulated.
+    //
+    // utils.levelsFilter(collection, filter)
+    // Applies a filter containing "levels" inclusively.
     //
     // utils.grades
     // An array of break points for color gradation.
@@ -64,10 +67,13 @@ var data,
     // utils.lineOpacity(number)
     // Returns the corresponding opacity for a given value.
 
+    globalFilter = {};
+
+    // We'll always update and pass this global to map.displayEdges() so
+    // that multiple controls can consistently update the edge display.
+
 (function () {
     "use strict";
-
-    // "Global" Variables
 
     var ATTRIBUTION = "Map data &copy;<a href='http://openstreetmap.org'>OpenStreetMap</a> contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery &copy;<a href='http://cloudmade.com'>CloudMade</a>",
         TILE_URL = "http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/53124/256/{z}/{x}/{y}.png",
@@ -75,6 +81,14 @@ var data,
         CLUSTER_CENTERS_URL = "data/nc_names_centers.json",
         SCHOOLS_URL = "data/schools.json",
         EDGES_URL = "data/commute_data_denorm.json";
+
+    if (window.location.hash) {
+        if (window.location.pathname === "/school.html") {
+            globalFilter.school_code = parseInt(window.location.hash.split('#')[1], 10);
+        } else if (window.location.pathname === "/neighborhood.html") {
+            globalFilter.cluster = parseInt(window.location.hash.split('#')[1], 10);
+        }
+    }
 
     data = (function () {
         var clusters, getClusters,
@@ -130,7 +144,19 @@ var data,
         };
 
         getEdges = function () {
-            var success = function (data) { edges = utils.oa2ao(data); },
+            var success = function (data) {
+                    edges = utils.oa2ao(data);
+                    _(edges).each(function (edge) {
+                        edge.elementary = (edge.prek_3 || edge.prek_4 || edge.preschool ||
+                                           edge.kindergarten || edge.grade_1 || edge.grade_2 ||
+                                           edge.grade_3 || edge.grade_4 || edge.grade_5);
+
+                        edge.middle =     (edge.grade_6 || edge.grade_7 || edge.grade_8);
+
+                        edge.high =       (edge.grade_9 || edge.grade_10 || edge.grade_11 ||
+                                           edge.grade_12);
+                    });
+                },
                 error = function (error) { };
             $.ajax({
                 dataType: "json",
@@ -150,22 +176,27 @@ var data,
             },
             schools: function (filter) {
                 if (!schools) { getSchools(); }
-                return filter ? _.where(schools, filter) : schools;
+                if (_.has(filter, "levels")) { return utils.levelsFilter(schools, filter); }
+                return (_.keys(filter).length > 0) ? _.where(schools, filter) : schools;
             },
             edges: function (filter) {
                 if (!edges) { getEdges(); }
-                return filter ? _.where(edges, filter) : edges;
+                if (_.has(filter, "levels")) { return utils.levelsFilter(edges, filter); }
+                return (_.keys(filter).length > 0) ? _.where(edges, filter) : edges;
             }
         };
     }());
 
-    Map = function (el) {
+    Map = function (el, disableClusterClicks) {
+        var map = this;
+
         this.superclass(el, { minZoom: 11, maxZoom: 14 });
         this.setView([38.895111, -77.036667], 12);
         L.tileLayer(TILE_URL, { attribution: ATTRIBUTION }).addTo(this);
 
+        this.disableClusterClicks = disableClusterClicks || false;
+
         this.clusters = L.geoJson(data.clusters(), {
-            map: this,
             style: {
                 fillColor: "#3875A3",
                 weight: 2,
@@ -174,13 +205,11 @@ var data,
                 fillOpacity: 0.5
             },
             onEachFeature: function (feature, layer) {
-                var highlight, reset, click,
-                    map = this.map;
+                var highlight, reset, click;
 
                 highlight = function (e) {
-                    var layer = e.target;
-                    layer.setStyle({ weight: 5, opacity: 1 });
-                    map.infobox.update(layer.feature.properties.NBH_NAMES);
+                    e.target.setStyle({ weight: 5, opacity: 1 });
+                    map.infobox.update(e.target.feature.properties.NBH_NAMES);
                 };
 
                 reset = function (e) {
@@ -188,13 +217,18 @@ var data,
                     map.infobox.update();
                 };
 
-                click = function (e) { map.displayEdges({ "cluster": e.target.feature.id }); };
+                click = function (e) {
+                    delete globalFilter.school_code;
+                    globalFilter.cluster = e.target.feature.id;
+                    map.displayEdges(globalFilter);
+                };
 
                 layer.on({
                     mouseover: highlight,
-                    mouseout: reset,
-                    click: click
+                    mouseout: reset
                 });
+
+                if (!map.disableClusterClicks) { layer.on({ click: click }); }
             }
         }).addTo(this);
 
@@ -225,7 +259,8 @@ var data,
         };
         this.legend.addTo(this);
         $(this.legend.div).hide();
-        this.legend.show = function () { $(this.div).show(); };
+        this.legend.show = _.once(function () { $(this.div).fadeIn(); });
+        if (_.keys(globalFilter).length > 0) { map.displayEdges(globalFilter); }
     };
 
     Map.prototype = L.Map.prototype;
@@ -234,10 +269,24 @@ var data,
     Map.prototype.displayEdges = function (filter) {
         var highlight, reset, click,
             map = this,
-            edges = data.edges(filter),
-            layerGroup = this.edges;
+            layerGroup = this.edges,
+            edges = _.sortBy(data.edges(filter), "count");
 
-        this.edgeOrigin = _.has(filter, "school_code") ? "school" : "cluster";
+        if (filter.cluster) {
+            this.edgeOrigin = "cluster";
+            if (window.location.pathname === "/neighborhood.html") {
+                window.location.hash = "#" + filter.cluster;
+            } else {
+                window.location.href = "/neighborhood.html#" + filter.cluster;
+            }
+        } else if (filter.school_code) {
+            this.edgeOrigin = "school";
+            if (window.location.pathname === "/school.html") {
+                window.location.hash = "#" + filter.school_code;
+            } else {
+                window.location.href = "/school.html#" + filter.school_code;
+            }
+        }
 
         highlight = function (e) {
             var layer = e.target;
@@ -255,10 +304,14 @@ var data,
         };
 
         click = function (e) {
-            if (map.edgeOrigin === "cluster") {
-                map.displayEdges({ "school_code": e.target.options.school_code });
+            if (map.edgeOrigin !== "school") {
+                delete globalFilter.cluster;
+                globalFilter.school_code = e.target.options.school_code;
+                map.displayEdges(globalFilter);
             } else {
-                map.displayEdges({ "cluster": e.target.options.cluster_id });
+                delete globalFilter.school_code;
+                globalFilter.cluster = e.target.options.cluster_id;
+                map.displayEdges(globalFilter);
             }
         };
 
@@ -313,6 +366,19 @@ var data,
             }
 
             return arr;
+        },
+
+        levelsFilter: function (collection, filter) {
+            var results;
+            if (_.keys(filter).length > 1) {
+                results = _.where(collection, _.omit(filter, "levels"));
+            } else {
+                results = collection;
+            }
+            results = _.filter(results, function (obj) {
+                return _(obj).pick(filter.levels).any();
+            });
+            return results;
         },
 
         grades: [0, 10, 20, 50, 80, 120, 150],

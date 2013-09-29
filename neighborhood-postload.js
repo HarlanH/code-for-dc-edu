@@ -4,15 +4,6 @@ $(function () {
     map = new Map('neighmap');
 });
 
-function updateIfHashedLink() {
-	if (window.location.hash) {
-		var id = window.location.hash.split('#')[1],
-		gisified = "00000000" + id,
-		evt = {target:{feature:{properties:{GIS_ID:gisified}}}};
-		displaySchools(evt);
-	}
-}
-
 // the active attribute doesn't change until after onclick is resolved so it's easier to manually track button state 
 var button_onoff = {
     "charter":1,
@@ -35,5 +26,22 @@ $('.btn-group').on('click', 'button', function(e){
         $(this).addClass("btn-primary");
 //             console.log("activating "+selected);
     }
-    displaySchools('none',$(this));
+    updateFilters();
 });
+
+function updateFilters() {
+    delete globalFilter.charter_status;
+    delete globalFilter.levels;
+    if (button_onoff.charter !== button_onoff["public"]) {
+        globalFilter.charter_status = (button_onoff.charter === 1) ? true : false;
+    }
+    if (!(button_onoff.elementary === button_onoff.middle && button_onoff.middle === button_onoff.high)) {
+        globalFilter.levels = [];
+        if (button_onoff.elementary === 1) { globalFilter.levels.push("elementary"); }
+        if (button_onoff.middle === 1) { globalFilter.levels.push("middle"); }
+        if (button_onoff.high === 1) { globalFilter.levels.push("high"); }
+    }
+    if (_.has(globalFilter, "cluster") || _.has(globalFilter, "school_code")) {
+        map.displayEdges(globalFilter);
+    }
+}
