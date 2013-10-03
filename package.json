@@ -9,7 +9,7 @@
     "express": "*"
   },
   "engines": {
-    "node": "*",
+    "node": "0.10.20",
     "npm": "*"
   }
 }
