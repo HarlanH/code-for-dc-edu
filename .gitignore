@@ -13,3 +13,5 @@ data/*.png
 mixture.json
 /data/.DS_Store
 /data/_site/
+
+*~
