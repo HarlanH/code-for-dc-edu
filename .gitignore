@@ -15,3 +15,5 @@ mixture.json
 /data/_site/
 
 *~
+
+/node_modules/
