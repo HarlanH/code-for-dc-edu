@@ -16,6 +16,9 @@ var data,
     // data.edges(filter)
     // Returns a collection of all edges matching the filter.
     // E.g. -> data.edges({"school_code": 1100})
+    //
+    // data.boundary(schoolCode)
+    // Returns geometry for a school's boundary zone.
 
     Map,
 
@@ -77,10 +80,10 @@ var data,
 
     var ATTRIBUTION = "Map data &copy;<a href='http://openstreetmap.org'>OpenStreetMap</a> contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/'>CC-BY-SA</a>, Imagery &copy;<a href='http://cloudmade.com'>CloudMade</a>",
         TILE_URL = "http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/53124/256/{z}/{x}/{y}.png",
-        CLUSTERS_URL = "clusters.geojson",
-        CLUSTER_CENTERS_URL = "data/nc_names_centers.json",
-        SCHOOLS_URL = "data/schools.json",
-        EDGES_URL = "data/commute_data_denorm.json";
+        CLUSTERS_URL = "/clusters.geojson",
+        CLUSTER_CENTERS_URL = "/data/nc_names_centers.json",
+        SCHOOLS_URL = "/data/schools.json",
+        EDGES_URL = "/data/commute_data_denorm.json";
 
     if (window.location.hash) {
         if (window.location.pathname === "/school.html") {
@@ -93,7 +96,9 @@ var data,
     data = (function () {
         var clusters, getClusters,
             schools, getSchools,
-            edges, getEdges;
+            edges, getEdges,
+            getBoundaries,
+            boundaries = {};
 
         getClusters = function () {
             var centers,
@@ -170,6 +175,22 @@ var data,
             return edges;
         };
 
+        getBoundaries = function (level) {
+            var success = function (data) {
+                    boundaries[level] = data;
+                },
+                error = function (error) { },
+                url = "/data/boundaries/" + level + ".geojson";
+            $.ajax({
+                dataType: "json",
+                url: url,
+                data: {},
+                async: false,
+                success: success,
+                error: error
+            });
+        };
+
         return {
             clusters: function () {
                 return clusters || getClusters();
@@ -183,6 +204,17 @@ var data,
                 if (!edges) { getEdges(); }
                 if (_.has(filter, "levels")) { return utils.levelsFilter(edges, filter); }
                 return (_.keys(filter).length > 0) ? _.where(edges, filter) : edges;
+            },
+            boundary: function (schoolCode) {
+                var level,
+                    school = data.schools({"school_code": schoolCode})[0];
+                if (!school.charter_status) {
+                    level = school.elementary ? "es" : school.middle ? "ms" : "shs";
+                    if (!boundaries[level]) { getBoundaries(level); }
+                    return _.where(boundaries[level].features,
+                        { "properties": { "BLDG_NUM": schoolCode } })[0].geometry.coordinates;
+                }
+                return [];
             }
         };
     }());
