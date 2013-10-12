@@ -48,7 +48,7 @@ var templates;
         updateButtonStatus = function () {
             if (globalFilter.charter_status) {
                 if (globalFilter.charter_status === true) {
-                    $("#public").removeClass("btn-primary active");
+                    $("#dcps").removeClass("btn-primary active");
                 } else {
                     $("#charter").removeClass("btn-primary active");
                 }
@@ -76,7 +76,7 @@ var templates;
                 "<p>",
                     "<div id='systembuttons' class='btn-group' data-toggle='buttons-checkbox'>",
                         "<button value='charter' id='charter' type='button' class='btn btn-primary active'>Charter</button>",
-                        "<button value='public' id='public' type='button' class='btn btn-primary active'>Public</button>",
+                        "<button value='dcps' id='dcps' type='button' class='btn btn-primary active'>DCPS</button>",
                     "</div>",
                     "<div id='levelsbuttons' class='btn-group' data-toggle='buttons-checkbox'>",
                         "<button value='elementary' id='elementary' type='button' class='btn btn-primary active'>Elementary</button>",
@@ -129,7 +129,7 @@ var templates;
                 "<p>",
                     "<div id='systembuttons' class='btn-group' data-toggle='buttons-checkbox'>",
                         "<button value='charter' id='charter' type='button' class='btn btn-primary active'>Charter</button>",
-                        "<button value='public' id='public' type='button' class='btn btn-primary active'>Public</button>",
+                        "<button value='dcps' id='dcps' type='button' class='btn btn-primary active'>DCPS</button>",
                     "</div>",
                     "<div id='levelsbuttons' class='btn-group' data-toggle='buttons-checkbox'>",
                         "<button value='elementary' id='elementary' type='button' class='btn btn-primary active'>Elementary</button>",
