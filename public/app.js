@@ -298,27 +298,27 @@ var data,
     Map.prototype = L.Map.prototype;
     Map.prototype.superclass = L.Map;
 
-    Map.prototype.displayEdges = function (filter) {
+    Map.prototype.displayEdges = function (filter, noactions) {
         var highlight, reset, click,
             map = this,
             layerGroup = this.edges,
             edges = _.sortBy(data.edges(filter), "count");
 
-        if (filter.cluster) {
-            this.edgeOrigin = "cluster";
-            if (window.location.pathname === "/neighborhood.html") {
-                window.location.hash = "#" + filter.cluster;
-            } else {
-                window.location.href = "/neighborhood.html#" + filter.cluster;
-            }
-        } else if (filter.school_code) {
-            this.edgeOrigin = "school";
-            if (window.location.pathname === "/school.html") {
-                window.location.hash = "#" + filter.school_code;
-            } else {
-                window.location.href = "/school.html#" + filter.school_code;
-            }
-        }
+        // if (filter.cluster) {
+        //     this.edgeOrigin = "cluster";
+        //     if (window.location.pathname === "/neighborhood.html") {
+        //         window.location.hash = "#" + filter.cluster;
+        //     } else {
+        //         window.location.href = "/neighborhood.html#" + filter.cluster;
+        //     }
+        // } else if (filter.school_code) {
+        //     this.edgeOrigin = "school";
+        //     if (window.location.pathname === "/school.html") {
+        //         window.location.hash = "#" + filter.school_code;
+        //     } else {
+        //         window.location.href = "/school.html#" + filter.school_code;
+        //     }
+        // }
 
         highlight = function (e) {
             var layer = e.target;
@@ -347,8 +347,6 @@ var data,
             }
         };
 
-        layerGroup.clearLayers();
-
         _(edges).forEach(function (edge) {
             var props, weight, opacity, color, text, lineseg,
                 cluster = _.where(data.clusters().features, {"id": edge.cluster})[0];
@@ -376,11 +374,43 @@ var data,
 
                 lineseg.addTo(layerGroup);
 
-                lineseg.on({ mouseover: highlight, mouseout: reset, click: click });
+                if (!noactions) {
+                    lineseg.on({ mouseover: highlight, mouseout: reset, click: click });
+                }
             }
         });
 
-        this.legend.show();
+        if (!noactions) {
+            this.legend.show();
+        }
+    };
+
+    Map.prototype.animate = function () {
+        var map = this,
+            randomEdges = function () {
+                map.displayEdges({"cluster": _.random(1,39)}, true);
+            },
+            fadeEdges = function() {
+                map.edges.eachLayer(function (layer) {
+                    var prevOpacity = layer.options.opacity;
+                    if (prevOpacity >= 0.5) {
+                        layer.setStyle({ opacity: prevOpacity - 0.05 });
+                    } else if (prevOpacity >= 0.01) {
+                        layer.setStyle({ opacity: prevOpacity - 0.01 });
+                    } else {
+                        map.edges.removeLayer(layer);
+                    }
+                });
+            };
+        randomEdges();
+        this.randomEdgesTimer = setInterval(randomEdges, 2000);
+        this.fadeEdgesTimer = setInterval(fadeEdges, 100);
+    };
+
+    Map.prototype.stopAnimation = function () {
+        clearInterval(this.randomEdgesTimer);
+        clearInterval(this.fadeEdgesTimer);
+        this.edges.clearLayers();
     };
 
     utils = {
@@ -427,7 +457,7 @@ var data,
         },
 
         lineOpacity: function (d) {
-            return d < 2 ? 0.4 : d < 100 ? 0.4 + (d / 100.0) * 0.5 : 0.9;
+            return d < 2 ? 0.4 : d < 100 ? 0.4 + (d / 200.0) * 0.5 : 0.9;
         }
     };
 
