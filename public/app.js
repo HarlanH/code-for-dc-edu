@@ -1,6 +1,6 @@
 /*jslint browser: true*/
 /*jslint nomen: true*/
-/*global $, _, L*/
+/*global $, _, L, templates*/
 
 var data,
 
@@ -20,6 +20,7 @@ var data,
     // data.boundary(schoolCode)
     // Returns geometry for a school's boundary zone.
 
+    map,
     Map,
 
     // Construct with map = new Map(element); where element is the ID of a DOM element.
@@ -33,6 +34,11 @@ var data,
     // at least "school_code" or "cluster" included in the filter parameters.
     // E.g. -> map.displayEdges({"cluster": 6})
     //
+    // map.animate()
+    // Starts an animated loop of random nc edges.
+    //
+    // map.stopAnimation()
+    //
     // PROPERTIES
     //
     // map.clusters
@@ -40,9 +46,6 @@ var data,
     //
     // map.edges
     // A layergroup for the edge polylines. Clear with map.edges.clearLayers().
-    //
-    // map.edgeOrigin
-    // Indicates whether displayed edges are originating from a "school" or a "cluster".
     //
     // map.infobox
     // A Leaflet control for tooltip info. Update with map.infobox.update(string).
@@ -70,6 +73,10 @@ var data,
     // utils.lineOpacity(number)
     // Returns the corresponding opacity for a given value.
 
+    onHashChange,
+    currentPage,
+    updatePageTemplate,
+
     globalFilter = {};
 
     // We'll always update and pass this global to map.displayEdges() so
@@ -85,13 +92,44 @@ var data,
         SCHOOLS_URL = "/data/schools.json",
         EDGES_URL = "/data/commute_data_denorm.json";
 
-    if (window.location.hash) {
-        if (window.location.pathname === "/school.html") {
-            globalFilter.school_code = parseInt(window.location.hash.split('#')[1], 10);
-        } else if (window.location.pathname === "/neighborhood.html") {
-            globalFilter.cluster = parseInt(window.location.hash.split('#')[1], 10);
+    $(function () {
+        templates["home"].t = $("#content").html();
+        map = new Map("map");
+        window.onhashchange = onHashChange;
+        onHashChange();
+    });
+
+    onHashChange = function () {
+        if (window.location.hash) {
+            var bananaSplit = window.location.hash.split('/'),
+                page = bananaSplit[1],
+                id = (bananaSplit.length === 3) ? parseInt(bananaSplit[2], 10) : null;
+
+            if (page !== currentPage) { updatePageTemplate(page); }
+
+            if (id) {
+                if (page === "school") {
+                    delete globalFilter.cluster;
+                    globalFilter.school_code = id;
+                } else if (page === "neighborhood") {
+                    delete globalFilter.school_code;
+                    globalFilter.cluster = id;
+                }
+                map.displayEdges(globalFilter);
+            }
+
+            templates[page].update(globalFilter);
+        } else if (currentPage !== "home") {
+            updatePageTemplate("home");
         }
-    }
+    };
+
+    updatePageTemplate = function (page) {
+        if (currentPage) { templates[currentPage].strike(); }
+        $("#content").html(templates[page].t);
+        templates[page].init();
+        currentPage = page;
+    };
 
     data = (function () {
         var clusters, getClusters,
@@ -250,9 +288,7 @@ var data,
                 };
 
                 click = function (e) {
-                    delete globalFilter.school_code;
-                    globalFilter.cluster = e.target.feature.id;
-                    map.displayEdges(globalFilter);
+                    window.location.hash = "#!/neighborhood/" + e.target.feature.id;
                 };
 
                 layer.on({
@@ -291,34 +327,20 @@ var data,
         };
         this.legend.addTo(this);
         $(this.legend.div).hide();
-        this.legend.show = _.once(function () { $(this.div).fadeIn(); });
+        this.legend.show = function () { $(this.div).fadeIn(); };
         if (_.keys(globalFilter).length > 0) { map.displayEdges(globalFilter); }
     };
 
     Map.prototype = L.Map.prototype;
     Map.prototype.superclass = L.Map;
 
-    Map.prototype.displayEdges = function (filter, noactions) {
+    Map.prototype.displayEdges = function (filter, animation) {
         var highlight, reset, click,
             map = this,
             layerGroup = this.edges,
             edges = _.sortBy(data.edges(filter), "count");
 
-        // if (filter.cluster) {
-        //     this.edgeOrigin = "cluster";
-        //     if (window.location.pathname === "/neighborhood.html") {
-        //         window.location.hash = "#" + filter.cluster;
-        //     } else {
-        //         window.location.href = "/neighborhood.html#" + filter.cluster;
-        //     }
-        // } else if (filter.school_code) {
-        //     this.edgeOrigin = "school";
-        //     if (window.location.pathname === "/school.html") {
-        //         window.location.hash = "#" + filter.school_code;
-        //     } else {
-        //         window.location.href = "/school.html#" + filter.school_code;
-        //     }
-        // }
+        if (!animation) { this.edges.clearLayers(); }
 
         highlight = function (e) {
             var layer = e.target;
@@ -336,14 +358,10 @@ var data,
         };
 
         click = function (e) {
-            if (map.edgeOrigin !== "school") {
-                delete globalFilter.cluster;
-                globalFilter.school_code = e.target.options.school_code;
-                map.displayEdges(globalFilter);
+            if (currentPage !== "school") {
+                window.location.hash = "#!/school/" + e.target.options.school_code;
             } else {
-                delete globalFilter.school_code;
-                globalFilter.cluster = e.target.options.cluster_id;
-                map.displayEdges(globalFilter);
+                window.location.hash = "#!/neighborhood/" + e.target.options.cluster_id;
             }
         };
 
@@ -374,23 +392,21 @@ var data,
 
                 lineseg.addTo(layerGroup);
 
-                if (!noactions) {
+                if (!animation) {
                     lineseg.on({ mouseover: highlight, mouseout: reset, click: click });
                 }
             }
         });
 
-        if (!noactions) {
-            this.legend.show();
-        }
+        if (!animation) { this.legend.show(); }
     };
 
     Map.prototype.animate = function () {
         var map = this,
             randomEdges = function () {
-                map.displayEdges({"cluster": _.random(1,39)}, true);
+                map.displayEdges({"cluster": _.random(1, 39)}, true);
             },
-            fadeEdges = function() {
+            fadeEdges = function () {
                 map.edges.eachLayer(function (layer) {
                     var prevOpacity = layer.options.opacity;
                     if (prevOpacity >= 0.5) {
@@ -402,6 +418,12 @@ var data,
                     }
                 });
             };
+        this.dragging.disable();
+        this.touchZoom.disable();
+        this.scrollWheelZoom.disable();
+        this.boxZoom.disable();
+        this.keyboard.disable();
+        $("#map").addClass("static");
         randomEdges();
         this.randomEdgesTimer = setInterval(randomEdges, 2000);
         this.fadeEdgesTimer = setInterval(fadeEdges, 100);
@@ -411,6 +433,12 @@ var data,
         clearInterval(this.randomEdgesTimer);
         clearInterval(this.fadeEdgesTimer);
         this.edges.clearLayers();
+        this.dragging.enable();
+        this.touchZoom.enable();
+        this.scrollWheelZoom.enable();
+        this.boxZoom.enable();
+        this.keyboard.enable();
+        $("#map").removeClass("static");
     };
 
     utils = {
