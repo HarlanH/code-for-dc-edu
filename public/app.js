@@ -93,7 +93,7 @@ var data,
         EDGES_URL = "/data/commute_data_denorm.json";
 
     $(function () {
-        templates["home"].t = $("#content").html();
+        templates.home.t = $("#content").html();
         map = new Map("map");
         window.onhashchange = onHashChange;
         onHashChange();

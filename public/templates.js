@@ -1,10 +1,64 @@
 /*jslint browser: true*/
-/*global $, _, map*/
+/*jslint nomen: true*/
+/*global $, _, map, data, globalFilter*/
 
 var templates;
 
 (function () {
     "use strict";
+
+    var updateFilters = function (e) {
+            var group = e.delegateTarget.id,
+                value = e.target.value;
+
+            switch (group) {
+            case "systembuttons":
+                $(e.target).toggleClass("btn-primary");
+                if ($("#systembuttons .btn-primary").length === 1) {
+                    globalFilter.charter_status = (value === "charter") ? false : true;
+                } else {
+                    delete globalFilter.charter_status;
+                    $("#systembuttons button").addClass("btn-primary active");
+                    $(e.target).toggleClass("active");
+                }
+                break;
+            case "levelsbuttons":
+                $(e.target).toggleClass("btn-primary");
+                if (!globalFilter.levels) { globalFilter.levels = ["elementary", "middle", "high"]; }
+                if (_.contains(globalFilter.levels, value)) {
+                    _.pull(globalFilter.levels, value);
+                } else {
+                    globalFilter.levels.push(value);
+                }
+                if (globalFilter.levels.length === 0) {
+                    delete globalFilter.levels;
+                    $("#levelsbuttons button").addClass("btn-primary active");
+                    $(e.target).toggleClass("active");
+                }
+                break;
+            case "wardsbuttons":
+                if (value === "allwards") {
+                    delete globalFilter.ward;
+                } else {
+                    globalFilter.ward = parseInt(value.charAt(1), 10);
+                }
+                break;
+            }
+        },
+        updateButtonStatus = function () {
+            if (globalFilter.charter_status) {
+                if (globalFilter.charter_status === true) {
+                    $("#public").removeClass("btn-primary active");
+                } else {
+                    $("#charter").removeClass("btn-primary active");
+                }
+            }
+            if (globalFilter.levels) {
+                _.forEach(_.difference(["elementary", "middle", "high"], globalFilter.levels), function (id) {
+                    $("#" + id).removeClass("btn-primary active");
+                });
+            }
+        };
 
     templates = {
         home: {
@@ -31,7 +85,7 @@ var templates;
                     "</div>",
                 "</p>",
                 "<p>",
-                    "<div id='wardsbuttons' class='btn-group2' data-toggle='buttons-radio'>",
+                    "<div id='wardsbuttons' class='btn-group' data-toggle='buttons-radio'>",
                         "<button name='ward' value='allwards' id='allwards' type='button' class='btn active'> All Wards</button>",
                         "<button name='ward' value='w1' id='w1' type='button' class='btn'> 1</button>",
                         "<button name='ward' value='w2' id='w2' type='button' class='btn'> 2</button>",
@@ -45,10 +99,28 @@ var templates;
                 "</p>",
                 "<select id='schoolsList' name='schoolsList'></select>"].join("\n"),
             init: function () {
+                updateButtonStatus();
+                delete globalFilter.cluster;
+                $(".btn-group").on("click.school", "button", function (e) { updateFilters(e); templates.school.update(); });
+                $('#schoolsList').on("change.school", function () {
+                    window.location.hash = "#!/school/" + parseInt($('#schoolsList').find(":selected").attr("id"), 10);
+                });
+                templates.school.update();
             },
             update: function () {
+                var $select = $('#schoolsList');
+                $select.html('');
+                $select.append('<option>Pick a School</option>');
+                _(data.schools(_.omit(globalFilter, "school_code"))).forEach(function (school) {
+                    $select.append('<option id="' + school.school_code + '">' + school.school_name + '</option>');
+                    if (school.school_code === globalFilter.school_code) {
+                        $("#schoolsList option[id='" + globalFilter.school_code + "']").prop('selected', true);
+                    }
+                });
             },
             strike: function () {
+                $(".btn-group").off(".school");
+                map.edges.clearLayers();
             }
         },
         neighborhood: {
@@ -66,11 +138,17 @@ var templates;
                     "</div>",
                 "</p>"].join("\n"),
             init: function () {
+                updateButtonStatus();
+                delete globalFilter.ward;
+                $(".btn-group").on("click.neighborhood", "button", function (e) { updateFilters(e); templates.neighborhood.update(); });
             },
             update: function () {
+                map.displayEdges(globalFilter);
             },
             strike: function () {
+                $(".btn-group").off(".neighborhood");
+                map.edges.clearLayers();
             }
         }
-    }
+    };
 }());
