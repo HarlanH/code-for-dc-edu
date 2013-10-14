@@ -100,7 +100,6 @@ var templates;
                 "<select id='schoolsList' name='schoolsList'></select>"].join("\n"),
             init: function () {
                 updateButtonStatus();
-                delete globalFilter.cluster;
                 $(".btn-group").on("click.school", "button", function (e) { updateFilters(e); templates.school.update(); });
                 $('#schoolsList').on("change.school", function () {
                     window.location.hash = "#!/school/" + parseInt($('#schoolsList').find(":selected").attr("id"), 10);
@@ -121,6 +120,8 @@ var templates;
             strike: function () {
                 $(".btn-group").off(".school");
                 map.edges.clearLayers();
+                delete globalFilter.school_code;
+                delete globalFilter.ward;
             }
         },
         neighborhood: {
@@ -139,15 +140,15 @@ var templates;
                 "</p>"].join("\n"),
             init: function () {
                 updateButtonStatus();
-                delete globalFilter.ward;
                 $(".btn-group").on("click.neighborhood", "button", function (e) { updateFilters(e); templates.neighborhood.update(); });
             },
             update: function () {
-                map.displayEdges(globalFilter);
+                if (globalFilter.cluster) { map.displayEdges(globalFilter); }
             },
             strike: function () {
                 $(".btn-group").off(".neighborhood");
                 map.edges.clearLayers();
+                delete globalFilter.cluster;
             }
         }
     };
