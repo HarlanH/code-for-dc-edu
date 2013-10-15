@@ -34,6 +34,10 @@ var data,
     // at least "school_code" or "cluster" included in the filter parameters.
     // E.g. -> map.displayEdges({"cluster": 6})
     //
+    // map.displayBoundaries(schoolCode)
+    // Adds a polygon for the passed school's zoning boundaries.
+    // Bare-bones implementation. To be fleshed out soon.
+    //
     // map.animate()
     // Starts an animated loop of random nc edges.
     //
@@ -46,6 +50,9 @@ var data,
     //
     // map.edges
     // A layergroup for the edge polylines. Clear with map.edges.clearLayers().
+    //
+    // map.boundaries
+    // A layergroup for school boundary polygons. Clear with map.boundaries.clearLayers().
     //
     // map.infobox
     // A Leaflet control for tooltip info. Update with map.infobox.update(string).
@@ -245,12 +252,16 @@ var data,
             },
             boundary: function (schoolCode) {
                 var level,
+                    llOrder = ["lng", "lat"],
                     school = data.schools({"school_code": schoolCode})[0];
                 if (!school.charter_status) {
                     level = school.elementary ? "es" : school.middle ? "ms" : "shs";
                     if (!boundaries[level]) { getBoundaries(level); }
-                    return _.where(boundaries[level].features,
-                        { "properties": { "BLDG_NUM": schoolCode } })[0].geometry.coordinates;
+                    return _(_.where(boundaries[level].features,
+                            {"properties": {"BLDG_NUM": schoolCode}})[0].geometry.coordinates[0])
+                        .initial()
+                        .map(function (coords) { return _.zipObject(llOrder, coords); })
+                        .value();
                 }
                 return [];
             }
@@ -301,6 +312,7 @@ var data,
         }).addTo(this);
 
         this.edges = L.layerGroup().addTo(this);
+        this.boundaries = L.layerGroup().addTo(this);
 
         this.infobox = L.control();
         this.infobox.onAdd = function () {
@@ -399,6 +411,17 @@ var data,
         });
 
         if (!animation) { this.legend.show(); }
+    };
+
+    Map.prototype.displayBoundary = function (schoolCode) {
+        var boundary,
+            map = this,
+            layerGroup = this.edges,
+            geometry = data.boundary(schoolCode);
+
+        boundary = L.polygon(geometry);
+
+        boundary.addTo(layerGroup);
     };
 
     Map.prototype.animate = function () {
