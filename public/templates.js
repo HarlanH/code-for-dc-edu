@@ -1,6 +1,6 @@
 /*jslint browser: true*/
 /*jslint nomen: true*/
-/*global $, _, map, data, globalFilter*/
+/*global $, _, map, data, utils, globalFilter*/
 
 var templates;
 
@@ -74,18 +74,18 @@ var templates;
             t: ["<b>Select a school from the dropdown menu to see where its students commute from.</b>",
                 "<div><b>Choose which schools are available through the dropdown menu using the buttons.</b></div>",
                 "<p>",
-                    "<div id='systembuttons' class='btn-group' data-toggle='buttons-checkbox'>",
+                    "<div id='systembuttons' class='btn-group filters' data-toggle='buttons-checkbox'>",
                         "<button value='charter' id='charter' type='button' class='btn btn-primary active'>Charter</button>",
                         "<button value='dcps' id='dcps' type='button' class='btn btn-primary active'>DCPS</button>",
                     "</div>",
-                    "<div id='levelsbuttons' class='btn-group' data-toggle='buttons-checkbox'>",
+                    "<div id='levelsbuttons' class='btn-group filters' data-toggle='buttons-checkbox'>",
                         "<button value='elementary' id='elementary' type='button' class='btn btn-primary active'>Elementary</button>",
                         "<button value='middle' id='middle' type='button' class='btn btn-primary active'>Middle</button>",
                         "<button value='high' id='high' type='button' class='btn btn-primary active'>High</button>",
                     "</div>",
                 "</p>",
                 "<p>",
-                    "<div id='wardsbuttons' class='btn-group' data-toggle='buttons-radio'>",
+                    "<div id='wardsbuttons' class='btn-group filters' data-toggle='buttons-radio'>",
                         "<button name='ward' value='allwards' id='allwards' type='button' class='btn active'> All Wards</button>",
                         "<button name='ward' value='w1' id='w1' type='button' class='btn'> 1</button>",
                         "<button name='ward' value='w2' id='w2' type='button' class='btn'> 2</button>",
@@ -97,14 +97,23 @@ var templates;
                         "<button name='ward' value='w8' id='w8' type='button' class='btn'> 8</button>",
                     "</div>",
                 "</p>",
-                "<select id='schoolsList' name='schoolsList'></select>"].join("\n"),
+                "<select id='schoolsList' name='schoolsList'></select>",
+                "<div id='school-info'></div>"].join("\n"),
+            schoolInfo: _.template([
+                "<h1><%= school.school_name %></h1>",
+                "<p><%= school.school_address %></p>",
+                "<p>",
+                "<a href='http://www.learndc.org/schoolprofiles/view#<%= utils.zeroPad(school.school_code, 4) %>/overview' target='_blank'>",
+                "Explore information about <%= school.school_name %> on LearnDC",
+                "</a>",
+                "</p>"
+            ].join("\n"), null, { 'variable': 'school' }),
             init: function () {
                 updateButtonStatus();
-                $(".btn-group").on("click.school", "button", function (e) { updateFilters(e); templates.school.update(); });
+                $(".filters").on("click.school", "button", function (e) { updateFilters(e); templates.school.update(); });
                 $('#schoolsList').on("change.school", function () {
                     window.location.hash = "#!/school/" + parseInt($('#schoolsList').find(":selected").attr("id"), 10);
                 });
-                templates.school.update();
             },
             update: function () {
                 var $select = $('#schoolsList');
@@ -116,9 +125,12 @@ var templates;
                         $("#schoolsList option[id='" + globalFilter.school_code + "']").prop('selected', true);
                     }
                 });
+                if (globalFilter.school_code) {
+                    $("#school-info").html(this.schoolInfo(data.schools({ "school_code": globalFilter.school_code })[0]));
+                }
             },
             strike: function () {
-                $(".btn-group").off(".school");
+                $(".filters").off(".school");
                 map.edges.clearLayers();
                 delete globalFilter.school_code;
                 delete globalFilter.ward;
@@ -128,25 +140,31 @@ var templates;
             t: ["<b>Click a neighborhood to see where its students attend school.</b>",
                 "<div><b>Use the buttons to hide various school types.</b></div>",
                 "<p>",
-                    "<div id='systembuttons' class='btn-group' data-toggle='buttons-checkbox'>",
+                    "<div id='systembuttons' class='btn-group filters' data-toggle='buttons-checkbox'>",
                         "<button value='charter' id='charter' type='button' class='btn btn-primary active'>Charter</button>",
                         "<button value='dcps' id='dcps' type='button' class='btn btn-primary active'>DCPS</button>",
                     "</div>",
-                    "<div id='levelsbuttons' class='btn-group' data-toggle='buttons-checkbox'>",
+                    "<div id='levelsbuttons' class='btn-group filters' data-toggle='buttons-checkbox'>",
                         "<button value='elementary' id='elementary' type='button' class='btn btn-primary active'>Elementary</button>",
                         "<button value='middle' id='middle' type='button' class='btn btn-primary active'>Middle</button>",
                         "<button value='high' id='high' type='button' class='btn btn-primary active'>High</button>",
                     "</div>",
-                "</p>"].join("\n"),
+                "</p>",
+                "<div id='neighborhood-info'></div>"].join("\n"),
+            neighborhoodInfo: _.template([
+                "<h1><%= neighborhood.NBH_NAMES %></h1>"
+            ].join("\n"), null, { 'variable': 'neighborhood' }),
             init: function () {
                 updateButtonStatus();
-                $(".btn-group").on("click.neighborhood", "button", function (e) { updateFilters(e); templates.neighborhood.update(); });
+                $(".filters").on("click.neighborhood", "button", function (e) { updateFilters(e); this.update(); });
             },
             update: function () {
-                if (globalFilter.cluster) { map.displayEdges(globalFilter); }
+                if (globalFilter.cluster) {
+                    $("#neighborhood-info").html(this.neighborhoodInfo(_.where(data.clusters().features, {"id": globalFilter.cluster})[0].properties));
+                }
             },
             strike: function () {
-                $(".btn-group").off(".neighborhood");
+                $(".filters").off(".neighborhood");
                 map.edges.clearLayers();
                 delete globalFilter.cluster;
             }

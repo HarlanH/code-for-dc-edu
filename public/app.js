@@ -79,6 +79,10 @@ var data,
     //
     // utils.lineOpacity(number)
     // Returns the corresponding opacity for a given value.
+    //
+    // utils.zeroPad(number, length)
+    // Returns a string, adding leading zeros to achieve length if necessary.
+    // h/t http://stackoverflow.com/a/1268377
 
     onHashChange,
     currentPage,
@@ -416,10 +420,10 @@ var data,
     Map.prototype.displayBoundary = function (schoolCode) {
         var boundary,
             map = this,
-            layerGroup = this.edges,
+            layerGroup = this.boundaries,
             geometry = data.boundary(schoolCode);
 
-        boundary = L.polygon(geometry);
+        boundary = L.polygon(geometry, { color: "#BD0026" });
 
         boundary.addTo(layerGroup);
     };
@@ -509,6 +513,15 @@ var data,
 
         lineOpacity: function (d) {
             return d < 2 ? 0.4 : d < 100 ? 0.4 + (d / 200.0) * 0.5 : 0.9;
+        },
+
+        zeroPad: function (num, numZeros) {
+            var n = Math.abs(num),
+                zeros = Math.max(0, numZeros - Math.floor(n).toString().length ),
+                zeroString = Math.pow(10,zeros).toString().substr(1);
+            if (num < 0) { zeroString = '-' + zeroString; }
+
+            return zeroString+n;
         }
     };
 
