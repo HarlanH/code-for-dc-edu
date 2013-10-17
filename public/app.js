@@ -49,10 +49,10 @@ var data,
     // A Leaflet geoJSON layer containing all of the neighborhood clusters.
     //
     // map.edges
-    // A layergroup for the edge polylines. Clear with map.edges.clearLayers().
+    // A featuregroup for the edge polylines. Clear with map.edges.clearLayers().
     //
     // map.boundaries
-    // A layergroup for school boundary polygons. Clear with map.boundaries.clearLayers().
+    // A featuregroup for school boundary polygons. Clear with map.boundaries.clearLayers().
     //
     // map.infobox
     // A Leaflet control for tooltip info. Update with map.infobox.update(string).
@@ -126,7 +126,6 @@ var data,
                     delete globalFilter.school_code;
                     globalFilter.cluster = id;
                 }
-                map.displayEdges(globalFilter);
             }
 
             templates[page].update(globalFilter);
@@ -255,17 +254,21 @@ var data,
                 return (_.keys(filter).length > 0) ? _.where(edges, filter) : edges;
             },
             boundary: function (schoolCode) {
-                var level,
+                var level, matches,
                     llOrder = ["lng", "lat"],
                     school = data.schools({"school_code": schoolCode})[0];
                 if (!school.charter_status) {
                     level = school.elementary ? "es" : school.middle ? "ms" : "shs";
                     if (!boundaries[level]) { getBoundaries(level); }
-                    return _(_.where(boundaries[level].features,
-                            {"properties": {"BLDG_NUM": schoolCode}})[0].geometry.coordinates[0])
-                        .initial()
-                        .map(function (coords) { return _.zipObject(llOrder, coords); })
-                        .value();
+                    matches = _.where(boundaries[level].features, {
+                        "properties": {"BLDG_NUM": schoolCode}
+                    });
+                    if (matches.length === 1) {
+                        return _(matches[0].geometry.coordinates[0])
+                            .initial()
+                            .map(function (coords) { return _.zipObject(llOrder, coords); })
+                            .value();
+                    }
                 }
                 return [];
             }
@@ -315,8 +318,8 @@ var data,
             }
         }).addTo(this);
 
-        this.edges = L.layerGroup().addTo(this);
-        this.boundaries = L.layerGroup().addTo(this);
+        this.edges = L.featureGroup().addTo(this);
+        this.boundaries = L.featureGroup().addTo(this);
 
         this.infobox = L.control();
         this.infobox.onAdd = function () {
@@ -353,7 +356,7 @@ var data,
     Map.prototype.displayEdges = function (filter, animation) {
         var highlight, reset, click,
             map = this,
-            layerGroup = this.edges,
+            featureGroup = this.edges,
             edges = _.sortBy(data.edges(filter), "count");
 
         if (!animation) { this.edges.clearLayers(); }
@@ -406,7 +409,7 @@ var data,
                         text: text
                     });
 
-                lineseg.addTo(layerGroup);
+                lineseg.addTo(featureGroup);
 
                 if (!animation) {
                     lineseg.on({ mouseover: highlight, mouseout: reset, click: click });
@@ -414,18 +417,24 @@ var data,
             }
         });
 
+        // this.fitBounds(featureGroup.getBounds());
+        // Zooming disabled until issue on line #436 is resolved.
+
         if (!animation) { this.legend.show(); }
     };
 
     Map.prototype.displayBoundary = function (schoolCode) {
         var boundary,
-            map = this,
-            layerGroup = this.boundaries,
+            featureGroup = this.boundaries,
             geometry = data.boundary(schoolCode);
 
         boundary = L.polygon(geometry, { color: "#BD0026" });
 
-        boundary.addTo(layerGroup);
+        featureGroup.clearLayers();
+        boundary.addTo(featureGroup);
+
+        // this.fitBounds(featureGroup.getBounds());
+        // Leaflet throws a typeerror here for reasons unknown.
     };
 
     Map.prototype.animate = function () {

@@ -98,7 +98,14 @@ var templates;
                     "</div>",
                 "</p>",
                 "<select id='schoolsList' name='schoolsList'></select>",
-                "<div id='school-info'></div>"].join("\n"),
+                "<div id='school-info'></div>",
+                "<div id='map-views-toggle' style='display: none; margin-top: 20px;'>",
+                    "<h4>View map data on&hellip;</h4>",
+                    "<ul class='nav nav-pills nav-stacked'>",
+                        "<li id='map-views-commutes' class='active'><a>Where this schools' students live</a></li>",
+                        "<li id='map-views-zones' class='disabled'><a>What areas are zoned for this school</a></li>",
+                    "</ul>",
+                "</div>"].join("\n"),
             schoolInfo: _.template([
                 "<h1><%= school.school_name %></h1>",
                 "<p><%= school.school_address %></p>",
@@ -111,6 +118,22 @@ var templates;
             init: function () {
                 updateButtonStatus();
                 $(".filters").on("click.school", "button", function (e) { updateFilters(e); templates.school.update(); });
+                $("#map-views-commutes").on("click.school", "a", function (e) {
+                    if (!$(e.delegateTarget).hasClass("disabled")) {
+                        $(e.delegateTarget).addClass("active");
+                        $("#map-views-zones").removeClass("active");
+                        map.boundaries.clearLayers();
+                        map.displayEdges(globalFilter);
+                    }
+                });
+                $("#map-views-zones").on("click.school", "a", function (e) {
+                    if (!$(e.delegateTarget).hasClass("disabled")) {
+                        $(e.delegateTarget).addClass("active");
+                        $("#map-views-commutes").removeClass("active");
+                        map.edges.clearLayers();
+                        map.displayBoundary(globalFilter.school_code);
+                    }
+                });
                 $('#schoolsList').on("change.school", function () {
                     window.location.hash = "#!/school/" + parseInt($('#schoolsList').find(":selected").attr("id"), 10);
                 });
@@ -126,12 +149,30 @@ var templates;
                     }
                 });
                 if (globalFilter.school_code) {
+                    var boundary = data.boundary(globalFilter.school_code);
                     $("#school-info").html(this.schoolInfo(data.schools({ "school_code": globalFilter.school_code })[0]));
+                    $("#map-views-toggle").show();
+                    if (boundary.length > 0) {
+                        $("#map-views-zones").removeClass("disabled");
+                    } else {
+                        $("#map-views-zones").addClass("disabled");
+                        $("#map-views-zones").removeClass("active");
+                        $("#map-views-commutes").addClass("active");
+                        map.boundaries.clearLayers();
+                    }
+                    if ($("#map-views-zones").hasClass("active")) {
+                        map.displayBoundary(globalFilter.school_code);
+                    } else {
+                        map.displayEdges(globalFilter);
+                    }
+                } else {
+                    $("#map-views-toggle").hide();
                 }
             },
             strike: function () {
                 $(".filters").off(".school");
                 map.edges.clearLayers();
+                map.boundaries.clearLayers();
                 delete globalFilter.school_code;
                 delete globalFilter.ward;
             }
