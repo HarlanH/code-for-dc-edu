@@ -362,13 +362,13 @@ var data,
         if (!animation) { this.edges.clearLayers(); }
 
         highlight = function (e) {
-            var layer = e.target;
+            var layer = e.layer;
             layer.setStyle({ weight: layer.options.weight + 3, opacity: 1 });
             map.infobox.update(layer.options.text);
         };
 
         reset = function (e) {
-            var layer = e.target;
+            var layer = e.layer;
             layer.setStyle({
                 weight: layer.options.orig_weight,
                 opacity: layer.options.orig_opacity
@@ -378,9 +378,9 @@ var data,
 
         click = function (e) {
             if (currentPage !== "school") {
-                window.location.hash = "#!/school/" + e.target.options.school_code;
+                window.location.hash = "#!/school/" + e.layer.options.school_code;
             } else {
-                window.location.hash = "#!/neighborhood/" + e.target.options.cluster_id;
+                window.location.hash = "#!/neighborhood/" + e.layer.options.cluster_id;
             }
         };
 

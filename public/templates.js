@@ -202,6 +202,7 @@ var templates;
             update: function () {
                 if (globalFilter.cluster) {
                     $("#neighborhood-info").html(this.neighborhoodInfo(_.where(data.clusters().features, {"id": globalFilter.cluster})[0].properties));
+                    map.displayEdges(globalFilter);
                 }
             },
             strike: function () {
