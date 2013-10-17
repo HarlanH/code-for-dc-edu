@@ -255,7 +255,6 @@ var data,
             },
             boundary: function (schoolCode) {
                 var level, matches,
-                    llOrder = ["lng", "lat"],
                     school = data.schools({"school_code": schoolCode})[0];
                 if (!school.charter_status) {
                     level = school.elementary ? "es" : school.middle ? "ms" : "shs";
@@ -266,7 +265,7 @@ var data,
                     if (matches.length === 1) {
                         return _(matches[0].geometry.coordinates[0])
                             .initial()
-                            .map(function (coords) { return _.zipObject(llOrder, coords); })
+                            .map(function (coords) { return [coords[1], coords[0]]; })
                             .value();
                     }
                 }
@@ -417,10 +416,10 @@ var data,
             }
         });
 
-        // this.fitBounds(featureGroup.getBounds());
-        // Zooming disabled until issue on line #436 is resolved.
-
-        if (!animation) { this.legend.show(); }
+        if (!animation) {
+            this.fitBounds(featureGroup.getBounds());
+            this.legend.show();
+        }
     };
 
     Map.prototype.displayBoundary = function (schoolCode) {
@@ -433,8 +432,7 @@ var data,
         featureGroup.clearLayers();
         boundary.addTo(featureGroup);
 
-        // this.fitBounds(featureGroup.getBounds());
-        // Leaflet throws a typeerror here for reasons unknown.
+        this.fitBounds(featureGroup.getBounds());
     };
 
     Map.prototype.animate = function () {
