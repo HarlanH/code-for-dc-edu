@@ -163,7 +163,7 @@ var templates;
                     if ($("#map-views-zones").hasClass("active")) {
                         map.displayBoundary(globalFilter.school_code);
                     } else {
-                        map.displayEdges(globalFilter);
+                        map.displayEdges({ "school_code": globalFilter.school_code });
                     }
                 } else {
                     $("#map-views-toggle").hide();
