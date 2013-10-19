@@ -46,3 +46,7 @@
 #map.static {
     cursor: default;
 }
+
+.nav-pills a:not(.disabled) {
+    cursor: pointer;
+}

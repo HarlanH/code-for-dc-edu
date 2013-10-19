@@ -49,10 +49,10 @@ var data,
     // A Leaflet geoJSON layer containing all of the neighborhood clusters.
     //
     // map.edges
-    // A layergroup for the edge polylines. Clear with map.edges.clearLayers().
+    // A featuregroup for the edge polylines. Clear with map.edges.clearLayers().
     //
     // map.boundaries
-    // A layergroup for school boundary polygons. Clear with map.boundaries.clearLayers().
+    // A featuregroup for school boundary polygons. Clear with map.boundaries.clearLayers().
     //
     // map.infobox
     // A Leaflet control for tooltip info. Update with map.infobox.update(string).
@@ -79,6 +79,10 @@ var data,
     //
     // utils.lineOpacity(number)
     // Returns the corresponding opacity for a given value.
+    //
+    // utils.zeroPad(number, length)
+    // Returns a string, adding leading zeros to achieve length if necessary.
+    // h/t http://stackoverflow.com/a/1268377
 
     onHashChange,
     currentPage,
@@ -122,7 +126,6 @@ var data,
                     delete globalFilter.school_code;
                     globalFilter.cluster = id;
                 }
-                map.displayEdges(globalFilter);
             }
 
             templates[page].update(globalFilter);
@@ -251,17 +254,23 @@ var data,
                 return (_.keys(filter).length > 0) ? _.where(edges, filter) : edges;
             },
             boundary: function (schoolCode) {
-                var level,
-                    llOrder = ["lng", "lat"],
+                var level, matches,
                     school = data.schools({"school_code": schoolCode})[0];
                 if (!school.charter_status) {
                     level = school.elementary ? "es" : school.middle ? "ms" : "shs";
                     if (!boundaries[level]) { getBoundaries(level); }
-                    return _(_.where(boundaries[level].features,
-                            {"properties": {"BLDG_NUM": schoolCode}})[0].geometry.coordinates[0])
-                        .initial()
-                        .map(function (coords) { return _.zipObject(llOrder, coords); })
-                        .value();
+                    matches = _.where(boundaries[level].features, {
+                        "properties": {"BLDG_NUM": schoolCode}
+                    });
+                    if (matches.length === 1) {
+                        return _(matches[0].geometry.coordinates[0])
+                            // Leaflet doesn't like polygons to repeat the first coordinate, so we drop it.
+                            .initial()
+                            // Now we need to reverse the ordering of each latitude/longitude pair.
+                            .map(function (coords) { return [coords[1], coords[0]]; })
+                            // And now let's get our value back from Lo-dash.
+                            .value();
+                    }
                 }
                 return [];
             }
@@ -311,8 +320,8 @@ var data,
             }
         }).addTo(this);
 
-        this.edges = L.layerGroup().addTo(this);
-        this.boundaries = L.layerGroup().addTo(this);
+        this.edges = L.featureGroup().addTo(this);
+        this.boundaries = L.featureGroup().addTo(this);
 
         this.infobox = L.control();
         this.infobox.onAdd = function () {
@@ -349,19 +358,19 @@ var data,
     Map.prototype.displayEdges = function (filter, animation) {
         var highlight, reset, click,
             map = this,
-            layerGroup = this.edges,
+            featureGroup = this.edges,
             edges = _.sortBy(data.edges(filter), "count");
 
         if (!animation) { this.edges.clearLayers(); }
 
         highlight = function (e) {
-            var layer = e.target;
+            var layer = e.layer;
             layer.setStyle({ weight: layer.options.weight + 3, opacity: 1 });
             map.infobox.update(layer.options.text);
         };
 
         reset = function (e) {
-            var layer = e.target;
+            var layer = e.layer;
             layer.setStyle({
                 weight: layer.options.orig_weight,
                 opacity: layer.options.orig_opacity
@@ -371,9 +380,9 @@ var data,
 
         click = function (e) {
             if (currentPage !== "school") {
-                window.location.hash = "#!/school/" + e.target.options.school_code;
+                window.location.hash = "#!/school/" + e.layer.options.school_code;
             } else {
-                window.location.hash = "#!/neighborhood/" + e.target.options.cluster_id;
+                window.location.hash = "#!/neighborhood/" + e.layer.options.cluster_id;
             }
         };
 
@@ -402,7 +411,7 @@ var data,
                         text: text
                     });
 
-                lineseg.addTo(layerGroup);
+                lineseg.addTo(featureGroup);
 
                 if (!animation) {
                     lineseg.on({ mouseover: highlight, mouseout: reset, click: click });
@@ -410,18 +419,23 @@ var data,
             }
         });
 
-        if (!animation) { this.legend.show(); }
+        if (!animation) {
+            this.fitBounds(featureGroup.getBounds());
+            this.legend.show();
+        }
     };
 
     Map.prototype.displayBoundary = function (schoolCode) {
         var boundary,
-            map = this,
-            layerGroup = this.edges,
+            featureGroup = this.boundaries,
             geometry = data.boundary(schoolCode);
 
-        boundary = L.polygon(geometry);
+        boundary = L.polygon(geometry, { color: "#BD0026" });
 
-        boundary.addTo(layerGroup);
+        featureGroup.clearLayers();
+        boundary.addTo(featureGroup);
+
+        this.fitBounds(featureGroup.getBounds());
     };
 
     Map.prototype.animate = function () {
@@ -509,6 +523,15 @@ var data,
 
         lineOpacity: function (d) {
             return d < 2 ? 0.4 : d < 100 ? 0.4 + (d / 200.0) * 0.5 : 0.9;
+        },
+
+        zeroPad: function (num, numZeros) {
+            var n = Math.abs(num),
+                zeros = Math.max(0, numZeros - Math.floor(n).toString().length ),
+                zeroString = Math.pow(10,zeros).toString().substr(1);
+            if (num < 0) { zeroString = '-' + zeroString; }
+
+            return zeroString+n;
         }
     };
 
