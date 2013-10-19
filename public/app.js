@@ -264,8 +264,11 @@ var data,
                     });
                     if (matches.length === 1) {
                         return _(matches[0].geometry.coordinates[0])
+                            // Leaflet doesn't like polygons to repeat the first coordinate, so we drop it.
                             .initial()
+                            // Now we need to reverse the ordering of each latitude/longitude pair.
                             .map(function (coords) { return [coords[1], coords[0]]; })
+                            // And now let's get our value back from Lo-dash.
                             .value();
                     }
                 }
