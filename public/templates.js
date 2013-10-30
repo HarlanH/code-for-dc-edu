@@ -193,15 +193,31 @@ var templates;
                 "</p>",
                 "<div id='neighborhood-info'></div>"].join("\n"),
             neighborhoodInfo: _.template([
-                "<h1><%= neighborhood.NBH_NAMES %></h1>"
+                "<h1><%= neighborhood.cluster.NBH_NAMES %></h1>",
+                "<div class='info'>",
+                "<h4>Top five schools by enrollment</h4>",
+                "<ol>",
+                "<% for (var school in neighborhood.schools) { %>",
+                "<li>",
+                "<a href='#!/school/<%= neighborhood.schools[school].school_code %>'>",
+                "<strong><%= neighborhood.schools[school].school_name %></strong><br />",
+                "<%= neighborhood.schools[school].count %> students",
+                "</a>",
+                "</li>",
+                "<% } %>",
+                "</ol>",
+                "</div>"
             ].join("\n"), null, { 'variable': 'neighborhood' }),
             init: function () {
                 updateButtonStatus();
-                $(".filters").on("click.neighborhood", "button", function (e) { updateFilters(e); this.update(); });
+                $(".filters").on("click.neighborhood", "button", function (e) { updateFilters(e); templates.neighborhood.update(); });
             },
             update: function () {
                 if (globalFilter.cluster) {
-                    $("#neighborhood-info").html(this.neighborhoodInfo(_.where(data.clusters().features, {"id": globalFilter.cluster})[0].properties));
+                    $("#neighborhood-info").html(this.neighborhoodInfo({
+                        cluster: _.where(data.clusters().features, {"id": globalFilter.cluster})[0].properties,
+                        schools: _(data.edges(globalFilter)).sortBy("count").filter(function(edge) { return edge.count !== -1; }).reverse().first(5).value()
+                    }));
                     map.displayEdges(globalFilter);
                 }
             },
