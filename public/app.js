@@ -280,7 +280,7 @@ var data,
     Map = function (el, disableClusterClicks) {
         var map = this;
 
-        this.superclass(el, { minZoom: 11, maxZoom: 14 });
+        this.superclass(el, { minZoom: 12, maxZoom: 14 });
         this.setView([38.895111, -77.036667], 12);
         L.tileLayer(TILE_URL, { attribution: ATTRIBUTION }).addTo(this);
 
