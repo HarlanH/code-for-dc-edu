@@ -199,7 +199,7 @@ var templates;
                 "<ol>",
                 "<% for (var school in neighborhood.schools) { %>",
                 "<li>",
-                "<a href='#!/school/<%= neighborhood.schools[school].school_code %>'>",
+                "<a href='#!/school/<%= neighborhood.schools[school].school_code %>' class='edge-link' data-school-code='<%= neighborhood.schools[school].school_code %>'>",
                 "<strong><%= neighborhood.schools[school].school_name %></strong><br />",
                 "<%= neighborhood.schools[school].count %> students",
                 "</a>",
@@ -219,10 +219,20 @@ var templates;
                         schools: _(data.edges(globalFilter)).sortBy("count").filter(function(edge) { return edge.count !== -1; }).reverse().first(5).value()
                     }));
                     map.displayEdges(globalFilter);
+                    $("a.edge-link").off(".neighborhood");
+                    $("a.edge-link").on("mouseenter.neighborhood", function (e) {
+                        var schoolCode = $(e.delegateTarget).data("schoolCode");
+                        map.edgesRef[schoolCode].fire('mouseover');
+                    });
+                    $("a.edge-link").on("mouseleave.neighborhood", function (e) {
+                        var schoolCode = $(e.delegateTarget).data("schoolCode");
+                        map.edgesRef[schoolCode].fire('mouseout');
+                    });
                 }
             },
             strike: function () {
                 $(".filters").off(".neighborhood");
+                $("a.edge-link").off(".neighborhood");
                 map.edges.clearLayers();
                 delete globalFilter.cluster;
             }
