@@ -321,6 +321,7 @@ var data,
         }).addTo(this);
 
         this.edges = L.featureGroup().addTo(this);
+        this.edgesRef = {};
         this.boundaries = L.featureGroup().addTo(this);
 
         this.infobox = L.control();
@@ -362,6 +363,8 @@ var data,
             edges = _.sortBy(data.edges(filter), "count");
 
         if (!animation) { this.edges.clearLayers(); }
+
+        this.edgesRef = {};
 
         highlight = function (e) {
             var layer = e.layer;
@@ -412,6 +415,7 @@ var data,
                     });
 
                 lineseg.addTo(featureGroup);
+                map.edgesRef[edge.school_code] = lineseg;
 
                 if (!animation) {
                     lineseg.on({ mouseover: highlight, mouseout: reset, click: click });
