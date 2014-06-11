@@ -6,7 +6,7 @@
     "url": "https://github.com/HarlanH/code-for-dc-edu.git"
   },
   "dependencies": {
-    "express": "*"
+    "express": "3.*"
   },
   "engines": {
     "node": "0.10.20",
